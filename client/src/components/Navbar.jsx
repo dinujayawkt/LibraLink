@@ -27,7 +27,9 @@ function Navbar({ user, onLogout }) {
     { path: '/', label: 'Dashboard', icon: 'bx-home-alt' },
     { path: '/books', label: 'Browse Books', icon: 'bx-book-open' },
     { path: '/my-books', label: 'My Books', icon: 'bx-book' },
-    { path: '/orders', label: 'Orders', icon: 'bx-shopping-bag' }
+    { path: '/orders', label: 'Orders', icon: 'bx-shopping-bag' },
+    { path: '/community', label: 'Community', icon: 'bx-group' },
+    { path: '/recommendations', label: 'Recommendations', icon: 'bx-star' }
   ];
 
   const adminItems = [
@@ -42,18 +44,18 @@ function Navbar({ user, onLogout }) {
 
   return (
     <nav className="bg-black shadow-lg border-b border-gray-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex justify-between items-center h">
+      <div className="max-w-[1480px] mx-auto px-6 lg:px-8 ">
+        <div className="flex justify-between items-center h ">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-2">
               <i className="bx bx-library text-3xl text-white"></i>
-              <span className="text-2xl font-bold text-white font-roboto">Library</span>
+              <span className="text-2xl font-bold text-white font-roboto">LibraLink</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-">
+          <div className="ml-5 md:flex items-center space-x- mr-4">
             {(user?.role === 'member') && (
               <>
                 {navItems.map((item) => (

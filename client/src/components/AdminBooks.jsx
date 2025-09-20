@@ -121,7 +121,7 @@ function AdminBooks({ user }) {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-black">📚 Manage Books</h1>
-              <p className="mt-1 text-sm text-gray-700">Add, edit, and delete books in the library</p>
+              <p className="mt-1 text-sm text-gray-700">Add, edit, and delete books in LibraLink</p>
             </div>
             <button
               onClick={() => setShowAddForm(true)}

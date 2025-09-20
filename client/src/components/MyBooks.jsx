@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import BookReviewsPopup from './BookReviewsPopup';
 
 const API_BASE = 'http://localhost:4000/api';
 
@@ -7,6 +8,8 @@ function MyBooks({ user }) {
   const [loading, setLoading] = useState(true);
   const [extending, setExtending] = useState({});
   const [returning, setReturning] = useState({});
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showReviewsPopup, setShowReviewsPopup] = useState(false);
 
   useEffect(() => {
     fetchMyBooks();
@@ -110,6 +113,16 @@ function MyBooks({ user }) {
     if (daysUntilDue === 1) return 'Due tomorrow';
     if (daysUntilDue <= 3) return `Due in ${daysUntilDue} days`;
     return `Due in ${daysUntilDue} days`;
+  };
+
+  const handleViewReviews = (book) => {
+    setSelectedBook(book);
+    setShowReviewsPopup(true);
+  };
+
+  const handleCloseReviewsPopup = () => {
+    setShowReviewsPopup(false);
+    setSelectedBook(null);
   };
 
   if (loading) {
@@ -238,6 +251,13 @@ function MyBooks({ user }) {
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
+                        <button
+                          onClick={() => handleViewReviews(transaction.book)}
+                          className="modern-btn modern-btn-secondary flex items-center space-x-2 text-sm"
+                        >
+                          <i className="bx bx-star text-lg"></i>
+                          <span>Review</span>
+                        </button>
                         <span className={`px-3 py-1 text-sm rounded-full font-semibold ${getStatusColor(transaction.status, transaction.dueAt)}`}>
                           {transaction.status === 'overdue' ? 'Returned Late' : 'Returned'}
                         </span>
@@ -250,6 +270,14 @@ function MyBooks({ user }) {
           </div>
         )}
       </div>
+      
+      {/* Book Reviews Popup */}
+      <BookReviewsPopup 
+        book={selectedBook}
+        isOpen={showReviewsPopup}
+        onClose={handleCloseReviewsPopup}
+        canWriteReview={true}
+      />
     </div>
   );
 }

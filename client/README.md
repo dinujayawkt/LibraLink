@@ -1,4 +1,9 @@
-# React + Vite
+
+# LibraLink
+
+LibraLink is a modern library management web application built with React and Vite.
+
+---
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

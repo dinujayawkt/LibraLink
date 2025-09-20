@@ -62,7 +62,7 @@ function AdminDashboard({ user }) {
             </h1>
           </div>
           <p className="text-lg text-gray-600">
-            Manage your library system
+            Manage your LibraLink system
           </p>
         </div>
 

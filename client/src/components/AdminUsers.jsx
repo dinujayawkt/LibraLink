@@ -94,7 +94,7 @@ function AdminUsers({ user }) {
             <i className="bx bx-user text-3xl text-black mr-3"></i>
             <h1 className="text-4xl font-bold text-black">Manage Users</h1>
           </div>
-          <p className="text-lg text-gray-600">View and manage all library users</p>
+          <p className="text-lg text-gray-600">View and manage all LibraLink users</p>
         </div>
 
         {/* Users List */}
