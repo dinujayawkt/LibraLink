@@ -1,6 +1,6 @@
 import React from 'react';
 
-function BookDetailsPopup({ book, isOpen, onClose }) {
+function BookDetailsPopup({ book, isOpen, onClose, onViewReviews }) {
   if (!isOpen || !book) return null;
 
   return (
@@ -77,9 +77,12 @@ function BookDetailsPopup({ book, isOpen, onClose }) {
 
             {/* Action Buttons */}
             <div className="flex space-x-3 pt-4">
-              <button className="flex-1 modern-btn modern-btn-primary flex items-center justify-center space-x-2">
-                <i className="bx bx-plus text-lg"></i>
-                <span>Add to Wishlist</span>
+              <button 
+                onClick={() => onViewReviews && onViewReviews(book)}
+                className="flex-1 modern-btn modern-btn-secondary flex items-center justify-center space-x-2"
+              >
+                <i className="bx bx-star text-lg"></i>
+                <span>View Reviews</span>
               </button>
               {book.totalCopies - book.borrowedCount > 0 ? (
                 <button className="flex-1 modern-btn modern-btn-primary flex items-center justify-center space-x-2">

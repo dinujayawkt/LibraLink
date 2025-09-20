@@ -59,7 +59,7 @@ function Dashboard({ user }) {
             Welcome back, {user.name}!
           </h1>
           <p className="text-sm text-gray-600">
-            Manage your library experience from here
+            Manage your LibraLink experience from here
           </p>
         </div>
 

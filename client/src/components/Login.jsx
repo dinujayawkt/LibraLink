@@ -63,7 +63,7 @@ function Login({ onLogin }) {
             <i className="bx bx-library text-3xl text-white"></i>
           </div>
           <h2 className="text-[40px] font-bold  text-white mb-2">
-            Sign in to Library
+            Sign in to LibraLink
           </h2>
           <p className="text-[13px] text-white">
             Or   {'  '}

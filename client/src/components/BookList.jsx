@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BookDetailsPopup from './BookDetailsPopup';
+import BookReviewsPopup from './BookReviewsPopup';
 
 const API_BASE = 'http://localhost:4000/api';
 
@@ -16,6 +17,7 @@ function BookList({ user }) {
   const [borrowing, setBorrowing] = useState({});
   const [selectedBook, setSelectedBook] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showReviewsPopup, setShowReviewsPopup] = useState(false);
   const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
@@ -53,6 +55,16 @@ function BookList({ user }) {
 
   const handleClosePopup = () => {
     setShowPopup(false);
+    setSelectedBook(null);
+  };
+
+  const handleViewReviews = (book) => {
+    setSelectedBook(book);
+    setShowReviewsPopup(true);
+  };
+
+  const handleCloseReviewsPopup = () => {
+    setShowReviewsPopup(false);
     setSelectedBook(null);
   };
 
@@ -136,7 +148,7 @@ function BookList({ user }) {
       <div className="content-wrapper">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-black mb-2">Browse Books</h1>
-          <p className="text-sm text-gray-600">Search and discover books in our library</p>
+          <p className="text-sm text-gray-600">Search and discover books in LibraLink</p>
         </div>
 
         {/* Search and Filters */}
@@ -375,6 +387,15 @@ function BookList({ user }) {
         book={selectedBook}
         isOpen={showPopup}
         onClose={handleClosePopup}
+        onViewReviews={handleViewReviews}
+      />
+      
+      {/* Book Reviews Popup */}
+      <BookReviewsPopup 
+        book={selectedBook}
+        isOpen={showReviewsPopup}
+        onClose={handleCloseReviewsPopup}
+        canWriteReview={false}
       />
     </div>
   );

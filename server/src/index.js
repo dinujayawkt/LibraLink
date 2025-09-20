@@ -10,6 +10,9 @@ import bookRoutes from './routes/books.js';
 import borrowRoutes from './routes/borrow.js';
 import orderRoutes from './routes/orders.js';
 import adminRoutes from './routes/admin.js';
+import reviewRoutes from './routes/reviews.js';
+import communityRoutes from './routes/communities.js';
+import recommendationRoutes from './routes/recommendations.js';
 
 const app = express();
 
@@ -26,6 +29,19 @@ app.use('/api/books', bookRoutes);
 app.use('/api/borrow', borrowRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/communities', communityRoutes);
+app.use('/api', recommendationRoutes);
+
+console.log('📋 Routes registered:');
+console.log('  - /api/auth');
+console.log('  - /api/books');
+console.log('  - /api/borrow');
+console.log('  - /api/orders');
+console.log('  - /api/admin');
+console.log('  - /api/reviews');
+console.log('  - /api/communities');
+console.log('  - /api/recommendations');
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 

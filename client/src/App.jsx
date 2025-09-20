@@ -11,6 +11,9 @@ import AdminBooks from './components/AdminBooks';
 import AdminUsers from './components/AdminUsers';
 import AdminOrders from './components/AdminOrders';
 import Wishlist from './components/Wishlist';
+import Community from './components/Community';
+import CommunityChat from './components/CommunityChat';
+import Recommendations from './components/Recommendations';
 import Navbar from './components/Navbar';
 
 const API_BASE = 'http://localhost:4000/api';
@@ -95,6 +98,18 @@ function App() {
         <Route 
           path="/wishlist" 
           element={user ? <Wishlist user={user} /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/community" 
+          element={user ? <Community user={user} /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/community/:communityId" 
+          element={user ? <CommunityChat user={user} /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/recommendations" 
+          element={user ? <Recommendations user={user} /> : <Navigate to="/login" replace />} 
         />
           <Route 
             path="/admin" 
