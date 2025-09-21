@@ -60,98 +60,143 @@ function Register({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm rounded-lg shadow-xl p-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-amber-900">
-            Create your account
+    <div className="h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-400/10 to-purple-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      <div className="max-w-md w-full space-y-8 bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl p-12 border border-white/20 relative z-10 fade-in">
+        <div className="text-center">
+          <div className="relative mb-8">
+            <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center mx-auto shadow-2xl floating">
+              <i className="bx bx-user-plus text-4xl text-white"></i>
+            </div>
+            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">
+              <i className="bx bx-check text-sm text-white"></i>
+            </div>
+          </div>
+          <h2 className="text-5xl font-black text-white mb-4 slide-in-up">
+            Join Us Today
           </h2>
-          <p className="mt-2 text-center text-sm text-amber-800">
+          <p className="text-xl text-white/80 mb-2 slide-in-up" style={{animationDelay: '0.2s'}}>
+            Create your <span className="text-gradient font-bold">LibraLink</span> account
+          </p>
+          <p className="text-sm text-white/60 slide-in-up" style={{animationDelay: '0.4s'}}>
             Or{' '}
-            <Link to="/login" className="font-medium text-amber-700 hover:text-amber-600">
+            <Link to="/login" className="text-gradient hover:text-white font-semibold underline underline-offset-4 transition-all duration-300">
               sign in to existing account
             </Link>
           </p>
         </div>
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-amber-800">
+        <form className="space-y-8" onSubmit={handleSubmit}>
+          <div className="space-y-6">
+            <div className="slide-in-up" style={{animationDelay: '0.6s'}}>
+              <label htmlFor="name" className="block text-lg font-semibold text-white mb-3">
                 Full Name
               </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-amber-400 placeholder-amber-600 text-amber-900 rounded-md focus:outline-none focus:ring-amber-600 focus:border-amber-600 sm:text-sm"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  className="modern-input pl-12"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+                <i className="bx bx-user absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 text-lg"></i>
+              </div>
             </div>
             
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-amber-800">
+            <div className="slide-in-up" style={{animationDelay: '0.8s'}}>
+              <label htmlFor="email" className="block text-lg font-semibold text-white mb-3">
                 Email Address
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-amber-400 placeholder-amber-600 text-amber-900 rounded-md focus:outline-none focus:ring-amber-600 focus:border-amber-600 sm:text-sm"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="modern-input pl-12"
+                  placeholder="Enter your email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <i className="bx bx-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 text-lg"></i>
+              </div>
             </div>
             
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-amber-800">
+            <div className="slide-in-up" style={{animationDelay: '1s'}}>
+              <label htmlFor="password" className="block text-lg font-semibold text-white mb-3">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-amber-400 placeholder-amber-600 text-amber-900 rounded-md focus:outline-none focus:ring-amber-600 focus:border-amber-600 sm:text-sm"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="modern-input pl-12"
+                  placeholder="Create a strong password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+                <i className="bx bx-lock-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 text-lg"></i>
+              </div>
             </div>
             
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-amber-800">
+            <div className="slide-in-up" style={{animationDelay: '1.2s'}}>
+              <label htmlFor="confirmPassword" className="block text-lg font-semibold text-white mb-3">
                 Confirm Password
               </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-amber-400 placeholder-amber-600 text-amber-900 rounded-md focus:outline-none focus:ring-amber-600 focus:border-amber-600 sm:text-sm"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  className="modern-input pl-12"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
+                <i className="bx bx-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 text-lg"></i>
+              </div>
             </div>
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
+            <div className="slide-in-up" style={{animationDelay: '1.4s'}}>
+              <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-200 text-center p-4 rounded-2xl flex items-center justify-center space-x-2">
+                <i className="bx bx-error-circle text-lg"></i>
+                <span className="font-medium">{error}</span>
+              </div>
+            </div>
           )}
 
-          <div>
+          <div className="slide-in-up" style={{animationDelay: '1.6s'}}>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-700 hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 disabled:opacity-50"
+              className="w-full modern-btn modern-btn-accent flex items-center justify-center space-x-3 disabled:opacity-50 group"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? (
+                <>
+                  <div className="loading-spinner w-5 h-5"></div>
+                  <span>Creating account...</span>
+                </>
+              ) : (
+                <>
+                  <i className="bx bx-user-plus text-xl group-hover:scale-110 transition-transform duration-300"></i>
+                  <span className="text-lg font-semibold">Create Account</span>
+                </>
+              )}
             </button>
           </div>
         </form>

@@ -56,69 +56,104 @@ function Login({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-10 border border-white/20">
+    <div className="h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      <div className="max-w-md w-full space-y-6 bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 border border-white/20 relative z-10 fade-in">
         <div className="text-center">
-          <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <i className="bx bx-library text-3xl text-white"></i>
+          <div className="relative mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl floating">
+              <i className="bx bx-library text-3xl text-white"></i>
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center animate-pulse">
+              <i className="bx bx-check text-xs text-white"></i>
+            </div>
           </div>
-          <h2 className="text-[40px] font-bold  text-white mb-2">
-            Sign in to LibraLink
+          <h2 className="text-3xl font-black text-white mb-3 slide-in-up">
+            Welcome Back
           </h2>
-          <p className="text-[13px] text-white">
-            Or   {'  '}
-            <Link to="/register" className="font- text-[13px] text-white hover:text-gray-700 underline">
-                &nbsp;Create A New Account
+          <p className="text-lg text-white/80 mb-2 slide-in-up" style={{animationDelay: '0.2s'}}>
+            Sign in to <span className="text-gradient font-bold">LibraLink</span>
+          </p>
+          <p className="text-sm text-white/60 slide-in-up" style={{animationDelay: '0.4s'}}>
+            Or{' '}
+            <Link to="/register" className="text-gradient hover:text-white font-semibold underline underline-offset-4 transition-all duration-300">
+              create a new account
             </Link>
           </p>
         </div>
         
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-[15px] font-semibold text-white mb-2">
-                Email address
+            <div className="slide-in-up" style={{animationDelay: '0.6s'}}>
+              <label htmlFor="email" className="block text-sm font-semibold text-white mb-2">
+                Email Address
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="modern-input"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="modern-input pl-10"
+                  placeholder="Enter your email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <i className="bx bx-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-sm"></i>
+              </div>
             </div>
-            <div>
-              <label htmlFor="password" className="block text-[15px] font-semibold text-white mb-2">
+            <div className="slide-in-up" style={{animationDelay: '0.8s'}}>
+              <label htmlFor="password" className="block text-sm font-semibold text-white mb-2">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="modern-input"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="modern-input pl-10"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+                <i className="bx bx-lock-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-sm"></i>
+              </div>
             </div>
           </div>
 
           {error && (
-            <div className="text-red-600 text-base text-center bg-red-50 p-3 rounded-lg">{error}</div>
+            <div className="slide-in-up" style={{animationDelay: '1s'}}>
+              <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-200 text-center p-3 rounded-xl flex items-center justify-center space-x-2">
+                <i className="bx bx-error-circle text-sm"></i>
+                <span className="text-sm font-medium">{error}</span>
+              </div>
+            </div>
           )}
 
-          <div>
+          <div className="slide-in-up" style={{animationDelay: '1.2s'}}>
             <button
               type="submit"
               disabled={loading}
-              className="w-full modern-btn modern-btn-primary flex items-center justify-center space-x-2 disabled:opacity-50"
+              className="w-full modern-btn modern-btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 group"
             >
-              <i className="bx bx-log-in text-lg"></i>
-              <span>{loading ? 'Signing in...' : 'Sign in'}</span>
+              {loading ? (
+                <>
+                  <div className="loading-spinner w-4 h-4"></div>
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <i className="bx bx-log-in text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                  <span className="font-semibold">Sign In</span>
+                </>
+              )}
             </button>
           </div>
         </form>

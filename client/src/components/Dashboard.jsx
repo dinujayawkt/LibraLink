@@ -46,158 +46,192 @@ function Dashboard({ user }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-4"></div>
+          <p className="text-white/80 text-lg font-medium">Loading your dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8">
-      <div className="content-wrapper">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-black mb-2">
-            Welcome back, {user.name}!
+      <div className="content-wrapper fade-in">
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl font-bold text-black mb-4 slide-in-up">
+            Welcome back, <span className="text-gradient">{user.name}</span>!
           </h1>
-          <p className="text-sm text-gray-600">
-            Manage your LibraLink experience from here
+          <p className="text-lg text-gray-600 slide-in-up" style={{animationDelay: '0.2s'}}>
+            Discover, explore, and manage your digital library experience
           </p>
+          <div className="w-24 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mx-auto mt-6 slide-in-up" style={{animationDelay: '0.4s'}}></div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="modern-card p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center">
-                  <i className="bx bx-library text-lg text-white"></i>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="modern-card p-8 group hover:scale-105 transition-all duration-500 slide-in-up" style={{animationDelay: '0.6s'}}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <i className="bx bx-library text-2xl text-white group-hover:scale-110 transition-transform duration-300"></i>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">{stats.totalBooks}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="ml-4 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-600 mb-1">
-                    Total Books
-                  </dt>
-                  <dd className="text-2xl font-bold text-black">
-                    {stats.totalBooks}
-                  </dd>
-                </dl>
+                <div>
+                  <h3 className="text-lg font-bold text-black mb-1">Total Books</h3>
+                  <p className="text-3xl font-black text-gradient">{stats.totalBooks}</p>
+                  <p className="text-sm text-gray-600">In our collection</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="modern-card p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center">
-                  <i className="bx bx-check-circle text-lg text-white"></i>
+          <div className="modern-card p-8 group hover:scale-105 transition-all duration-500 slide-in-up" style={{animationDelay: '0.8s'}}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <i className="bx bx-check-circle text-2xl text-white group-hover:scale-110 transition-transform duration-300"></i>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">{stats.availableBooks}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="ml-4 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-600 mb-1">
-                    Available Books
-                  </dt>
-                  <dd className="text-2xl font-bold text-black">
-                    {stats.availableBooks}
-                  </dd>
-                </dl>
+                <div>
+                  <h3 className="text-lg font-bold text-black mb-1">Available Books</h3>
+                  <p className="text-3xl font-black text-gradient">{stats.availableBooks}</p>
+                  <p className="text-sm text-gray-600">Ready to borrow</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="modern-card p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center">
-                  <i className="bx bx-book text-lg text-white"></i>
+          <div className="modern-card p-8 group hover:scale-105 transition-all duration-500 slide-in-up" style={{animationDelay: '1s'}}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <i className="bx bx-book text-2xl text-white group-hover:scale-110 transition-transform duration-300"></i>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">{stats.myBorrowedBooks}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="ml-4 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-600 mb-1">
-                    My Borrowed Books
-                  </dt>
-                  <dd className="text-2xl font-bold text-black">
-                    {stats.myBorrowedBooks}
-                  </dd>
-                </dl>
+                <div>
+                  <h3 className="text-lg font-bold text-black mb-1">My Books</h3>
+                  <p className="text-3xl font-black text-gradient">{stats.myBorrowedBooks}</p>
+                  <p className="text-sm text-gray-600">Currently borrowed</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Link
-            to="/books"
-            className="modern-card p-6 text-center group hover:scale-105 transition-transform duration-200"
-          >
-            <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-800 transition-colors">
-              <i className="bx bx-search text-lg text-white"></i>
-            </div>
-            <h3 className="text-lg font-bold text-black mb-2">Browse Books</h3>
-            <p className="text-sm text-gray-600">Search and discover books</p>
-          </Link>
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-black mb-8 text-center slide-in-up" style={{animationDelay: '1.2s'}}>
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Link
+              to="/books"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              style={{animationDelay: '1.4s'}}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                <i className="bx bx-search text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-3 group-hover:text-gradient transition-all duration-300">Browse Books</h3>
+              <p className="text-sm text-gray-600 group-hover:text-black transition-colors duration-300">Discover and explore our vast collection</p>
+              <div className="mt-4 w-8 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mx-auto group-hover:w-12 transition-all duration-300"></div>
+            </Link>
 
-          <Link
-            to="/my-books"
-            className="modern-card p-6 text-center group hover:scale-105 transition-transform duration-200"
-          >
-            <div className="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-700 transition-colors">
-              <i className="bx bx-book text-lg text-white"></i>
-            </div>
-            <h3 className="text-lg font-bold text-black mb-2">My Books</h3>
-            <p className="text-sm text-gray-600">View borrowed books</p>
-          </Link>
+            <Link
+              to="/my-books"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              style={{animationDelay: '1.6s'}}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                <i className="bx bx-book text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-3 group-hover:text-gradient transition-all duration-300">My Books</h3>
+              <p className="text-sm text-gray-600 group-hover:text-black transition-colors duration-300">Manage your borrowed books</p>
+              <div className="mt-4 w-8 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto group-hover:w-12 transition-all duration-300"></div>
+            </Link>
 
-          <Link
-            to="/orders"
-            className="modern-card p-6 text-center group hover:scale-105 transition-transform duration-200"
-          >
-            <div className="w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-500 transition-colors">
-              <i className="bx bx-shopping-bag text-lg text-white"></i>
-            </div>
-            <h3 className="text-lg font-bold text-black mb-2">Orders</h3>
-            <p className="text-sm text-gray-600">Request new books</p>
-          </Link>
+            <Link
+              to="/orders"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              style={{animationDelay: '1.8s'}}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                <i className="bx bx-shopping-bag text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-3 group-hover:text-gradient transition-all duration-300">Orders</h3>
+              <p className="text-sm text-gray-600 group-hover:text-black transition-colors duration-300">Request and track new books</p>
+              <div className="mt-4 w-8 h-1 bg-gradient-to-r from-green-400 to-teal-400 rounded-full mx-auto group-hover:w-12 transition-all duration-300"></div>
+            </Link>
 
-          <div className="modern-card p-6 text-center">
-            <div className="w-12 h-12 bg-gray-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <i className="bx bx-bar-chart text-lg text-white"></i>
-            </div>
-            <h3 className="text-lg font-bold text-black mb-2">Statistics</h3>
-            <p className="text-sm text-gray-600">View library stats</p>
+            <Link
+              to="/recommendations"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              style={{animationDelay: '2s'}}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                <i className="bx bx-star text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-3 group-hover:text-gradient transition-all duration-300">Recommendations</h3>
+              <p className="text-sm text-gray-600 group-hover:text-black transition-colors duration-300">Personalized book suggestions</p>
+              <div className="mt-4 w-8 h-1 bg-gradient-to-r from-orange-400 to-red-400 rounded-full mx-auto group-hover:w-12 transition-all duration-300"></div>
+            </Link>
           </div>
         </div>
 
         {/* Popular Books */}
         {stats.popularBooks.length > 0 && (
-          <div className="modern-card p-6">
-            <div className="flex items-center mb-4">
-              <i className="bx bx-trending-up text-lg text-black mr-3"></i>
-              <h3 className="text-xl font-bold text-black">
-                Popular Books
-              </h3>
+          <div className="modern-card p-8 slide-in-up" style={{animationDelay: '2.2s'}}>
+            <div className="flex items-center justify-center mb-8">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <i className="bx bx-trending-up text-xl text-white"></i>
+                </div>
+                <h3 className="text-2xl font-bold text-black">
+                  Trending Books
+                </h3>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {stats.popularBooks.map((book, index) => (
-                <div key={book._id} className="border border-gray-200 rounded-xl p-4 hover:border-black transition-colors group">
-                  <div className="flex items-start justify-between mb-3">
+                <div key={book._id} className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20 hover:border-white/40">
+                  <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h4 className="text-sm font-bold text-black truncate group-hover:text-gray-700">
+                      <h4 className="text-lg font-bold text-black truncate group-hover:text-gradient transition-all duration-300">
                         {book.title}
                       </h4>
-                      <p className="text-sm text-gray-600 truncate mt-1">
+                      <p className="text-sm text-gray-600 truncate mt-2 group-hover:text-black transition-colors duration-300">
                         by {book.author}
                       </p>
                     </div>
-                    <span className="text-lg font-bold text-black ml-3">
-                      #{index + 1}
-                    </span>
+                    <div className="flex flex-col items-center ml-4">
+                      <span className="text-2xl font-black text-gradient">
+                        #{index + 1}
+                      </span>
+                      <div className="w-8 h-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mt-1"></div>
+                    </div>
                   </div>
-                  <div className="flex items-center text-xs text-gray-500">
-                    <i className="bx bx-bar-chart mr-2"></i>
-                    <span>{book.borrowedCount} borrows</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-gray-500 group-hover:text-black transition-colors duration-300">
+                      <i className="bx bx-bar-chart mr-2"></i>
+                      <span>{book.borrowedCount} borrows</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      {[...Array(5)].map((_, i) => (
+                        <i key={i} className={`bx bxs-star text-sm ${i < 4 ? 'text-yellow-400' : 'text-gray-300'}`}></i>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
