@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from './ToastProvider';
 import { useParams, useNavigate } from 'react-router-dom';
-
-const API_BASE = 'http://localhost:4000/api';
+import { API_BASE } from '../config';
 
 function CommunityChat({ user }) {
   const { communityId } = useParams();

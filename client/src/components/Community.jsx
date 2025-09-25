@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from './ToastProvider';
 import { Link } from 'react-router-dom';
-
-const API_BASE = 'http://localhost:4000/api';
+import { API_BASE } from '../config';
 
 function Community({ user }) {
   const [communities, setCommunities] = useState([]);

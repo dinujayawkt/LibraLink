@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { API_BASE } from './config';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
@@ -15,8 +16,6 @@ import Community from './components/Community';
 import CommunityChat from './components/CommunityChat';
 import Recommendations from './components/Recommendations';
 import Navbar from './components/Navbar';
-
-const API_BASE = 'http://localhost:4000/api';
 
 function App() {
   const [user, setUser] = useState(null);

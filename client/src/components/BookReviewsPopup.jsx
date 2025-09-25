@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from './ToastProvider';
-
-const API_BASE = 'http://localhost:4000/api';
+import { API_BASE } from '../config';
 
 function BookReviewsPopup({ book, isOpen, onClose, canWriteReview = false }) {
   const [reviews, setReviews] = useState([]);

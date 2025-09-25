@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-
-const API_BASE = 'http://localhost:4000/api';
+import { API_BASE } from '../config';
 
 function AdminDashboard({ user }) {
   const [stats, setStats] = useState({

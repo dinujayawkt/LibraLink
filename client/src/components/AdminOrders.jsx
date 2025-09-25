@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from './ToastProvider';
-
-const API_BASE = 'http://localhost:4000/api';
+import { API_BASE } from '../config';
 
 function AdminOrders({ user }) {
   const [orders, setOrders] = useState([]);
