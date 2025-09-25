@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 
 const API_BASE = 'http://localhost:4000/api';
 
 function AdminOrders({ user }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   useEffect(() => {
     fetchOrders();
@@ -37,14 +39,14 @@ function AdminOrders({ user }) {
       });
 
       if (response.ok) {
-        alert(`Order ${newStatus} successfully!`);
+        toast.success(`Order ${newStatus} successfully!`);
         fetchOrders();
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to update order status');
+        toast.error(errorData.message || 'Failed to update order status');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     }
   };
 
@@ -71,26 +73,32 @@ function AdminOrders({ user }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-4"></div>
+          <p className="text-white/80 text-lg font-medium">Loading orders...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8">
-      <div className="content-wrapper">
-        <div className="mb-8">
-          <div className="flex items-center mb-2">
-            <i className="bx bx-package text-2xl text-black mr-3"></i>
-            <h1 className="text-2xl font-bold text-black">Manage Orders</h1>
+      <div className="content-wrapper fade-in">
+        <div className="mb-8 text-center slide-in-up">
+          <div className="flex items-center justify-center mb-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg mr-3">
+              <i className="bx bx-package text-white"></i>
+            </div>
+            <h1 className="text-3xl font-bold text-black"><span className="text-gradient">Manage Orders</span></h1>
           </div>
           <p className="text-sm text-gray-600">Approve and manage book requests</p>
+          <div className="w-20 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mx-auto mt-3"></div>
         </div>
 
         {/* Orders List */}
         <div className="space-y-6">
           {orders.length === 0 ? (
-            <div className="text-center py-16 modern-card">
+            <div className="text-center py-16 modern-card slide-in-up">
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="bx bx-package text-4xl text-gray-400"></i>
               </div>
@@ -99,7 +107,7 @@ function AdminOrders({ user }) {
             </div>
           ) : (
             orders.map((order) => (
-              <div key={order._id} className="modern-card p-4 group hover:scale-105 transition-transform duration-200">
+              <div key={order._id} className="modern-card p-4 group hover:scale-105 transition-transform duration-200 slide-in-up">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-3">
@@ -153,14 +161,14 @@ function AdminOrders({ user }) {
                     <>
                       <button
                         onClick={() => handleStatusUpdate(order._id, 'approved')}
-                        className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg flex items-center space-x-2 text-sm font-medium transition-all duration-200"
+                        className="modern-btn bg-green-600 text-white hover:bg-green-700 flex items-center space-x-2 text-sm font-medium"
                       >
                         <i className="bx bx-check text-sm"></i>
                         <span>Approve</span>
                       </button>
                       <button
                         onClick={() => handleStatusUpdate(order._id, 'rejected')}
-                        className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg flex items-center space-x-2 text-sm font-medium transition-all duration-200"
+                        className="modern-btn bg-red-600 text-white hover:bg-red-700 flex items-center space-x-2 text-sm font-medium"
                       >
                         <i className="bx bx-x text-sm"></i>
                         <span>Reject</span>
@@ -171,7 +179,7 @@ function AdminOrders({ user }) {
                   {order.status === 'approved' && (
                     <button
                       onClick={() => handleStatusUpdate(order._id, 'purchased')}
-                      className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg flex items-center space-x-2 text-sm font-medium transition-all duration-200"
+                      className="modern-btn bg-blue-600 text-white hover:bg-blue-700 flex items-center space-x-2 text-sm font-medium"
                     >
                       <i className="bx bx-check-circle text-sm"></i>
                       <span>Mark as Purchased</span>

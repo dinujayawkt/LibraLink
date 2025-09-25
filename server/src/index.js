@@ -16,7 +16,25 @@ import recommendationRoutes from './routes/recommendations.js';
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173', credentials: true }));
+// CORS with dev-friendly origin matching
+const defaultOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const configuredOrigin = process.env.CLIENT_ORIGIN ? [process.env.CLIENT_ORIGIN] : [];
+const allowedOrigins = [...new Set([...configuredOrigin, ...defaultOrigins])];
+
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow non-browser or same-origin
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Also allow any localhost:* during development
+      if (/^http:\/\/localhost:\d+$/i.test(origin) || /^http:\/\/127\.0\.0\.1:\d+$/i.test(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
+  })
+);
 app.use(cookieParser());
 app.use(express.json({ limit: '5mb' }));
 

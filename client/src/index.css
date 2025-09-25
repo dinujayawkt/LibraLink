@@ -78,13 +78,17 @@ body {
 
 .modern-btn-primary {
   @apply bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-xl;
+  /* Ensure strong contrast on light cards */
+  color: #ffffff;
+  border: 2px solid rgba(0, 0, 0, 0.08);
   background-size: 200% 200%;
   animation: gradientShift 3s ease infinite;
 }
 
 .modern-btn-secondary {
-  @apply bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50;
-  backdrop-filter: blur(10px);
+  /* Improve visibility on light backgrounds */
+  @apply bg-white text-gray-900 border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400;
+  backdrop-filter: blur(6px);
 }
 
 .modern-btn-accent {
@@ -153,7 +157,7 @@ body {
   }
 }
 
-.slide-in-up {
+.slide-in-up1 {
   animation: slideInUp 0.6s ease-out;
 }
 
@@ -212,6 +216,14 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.text-gradient2 {
+  background: linear-gradient( #ececec, #6062d6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
 }
 
 /* Glow effect */

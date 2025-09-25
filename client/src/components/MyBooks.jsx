@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 import BookReviewsPopup from './BookReviewsPopup';
 
 const API_BASE = 'http://localhost:4000/api';
@@ -10,6 +11,7 @@ function MyBooks({ user }) {
   const [returning, setReturning] = useState({});
   const [selectedBook, setSelectedBook] = useState(null);
   const [showReviewsPopup, setShowReviewsPopup] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     fetchMyBooks();
@@ -46,18 +48,36 @@ function MyBooks({ user }) {
       });
 
       if (response.ok) {
-        alert('Book return date extended successfully!');
-        fetchMyBooks(); // Refresh the list
+        let updatedTx = null;
+        try {
+          updatedTx = await response.json();
+        } catch (_) {}
+        // Update only this transaction locally (fallback: add days optimistically)
+        setTransactions(prev => prev.map(tx => {
+          if (tx._id !== transactionId) return tx;
+          if (updatedTx && updatedTx._id) return updatedTx;
+          const prevDue = new Date(tx.dueAt);
+          const newDue = new Date(prevDue.getTime());
+          newDue.setDate(newDue.getDate() + days);
+          return {
+            ...tx,
+            dueAt: newDue.toISOString(),
+            extensions: Array.isArray(tx.extensions) ? [...tx.extensions, { days, at: new Date().toISOString() }] : [{ days, at: new Date().toISOString() }]
+          };
+        }));
+        toast.success('Book return date extended successfully!');
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to extend book');
+        toast.error(errorData.message || 'Failed to extend book');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setExtending(prev => ({ ...prev, [transactionId]: false }));
     }
   };
+
+  
 
   const handleReturn = async (transactionId) => {
     if (returning[transactionId]) return;
@@ -75,14 +95,26 @@ function MyBooks({ user }) {
       });
 
       if (response.ok) {
-        alert('Book returned successfully!');
-        fetchMyBooks(); // Refresh the list
+        let updatedTx = null;
+        try {
+          updatedTx = await response.json();
+        } catch (_) {}
+        setTransactions(prev => prev.map(tx => {
+          if (tx._id !== transactionId) return tx;
+          if (updatedTx && updatedTx._id) return updatedTx;
+          return {
+            ...tx,
+            status: 'returned',
+            returnedAt: new Date().toISOString()
+          };
+        }));
+        toast.success('Book returned successfully!');
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to return book');
+        toast.error(errorData.message || 'Failed to return book');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setReturning(prev => ({ ...prev, [transactionId]: false }));
     }
@@ -139,16 +171,16 @@ function MyBooks({ user }) {
   return (
     <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8 ">
       <div className="content-wrapper">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-black mb-2">My Books</h1>
-          <p className="text-[16px] text-gray-600">Manage your borrowed books and view history</p>
+        <div className="mb-5">
+          <h1 className="text-lg md:text-xl font-bold text-black mb-1">My Books</h1>
+          <p className="text-sm md:text-base text-gray-600">Manage your borrowed books and view history</p>
         </div>
 
         {/* Active Books */}
         <div className="mb-12">
-          <div className="flex items-center mb-6">
-            <i className="bx bx-book text-xl text-black mr-3"></i>
-            <h2 className="text-xl font-bold text-black">
+          <div className="flex items-center mb-3">
+            <i className="bx bx-book text-base md:text-lg text-black mr-3"></i>
+            <h2 className="text-base md:text-lg font-bold text-black">
               Currently Borrowed ({activeBooks.length})
             </h2>
           </div>
@@ -166,7 +198,7 @@ function MyBooks({ user }) {
                 <div key={transaction._id} className="modern-card p-6">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-black line-clamp-2 mb-2">
+                      <h3 className="text-lg md:text-xl font-bold text-black line-clamp-2 mb-1">
                         {transaction.book?.title || 'Unknown Book'}
                       </h3>
                       <p className="text-gray-600">
@@ -226,9 +258,9 @@ function MyBooks({ user }) {
         {/* Returned Books History */}
         {returnedBooks.length > 0 && (
           <div>
-            <div className="flex items-center mb-6">
-              <i className="bx bx-history text-2xl text-black mr-3"></i>
-              <h2 className="text-xl font-bold text-black">
+            <div className="flex items-center mb-3">
+              <i className="bx bx-history text-lg md:text-xl text-black mr-3"></i>
+              <h2 className="text-base md:text-lg font-bold text-black">
                 Return History ({returnedBooks.length})
               </h2>
             </div>
@@ -253,7 +285,7 @@ function MyBooks({ user }) {
                       <div className="flex items-center space-x-3">
                         <button
                           onClick={() => handleViewReviews(transaction.book)}
-                          className="modern-btn modern-btn-secondary flex items-center space-x-2 text-sm"
+                          className="modern-btn bg-gray-900 text-white hover:bg-gray-800 flex items-center space-x-2 text-sm"
                         >
                           <i className="bx bx-star text-lg"></i>
                           <span>Review</span>

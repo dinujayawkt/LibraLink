@@ -18,24 +18,54 @@ function Dashboard({ user }) {
 
   const fetchDashboardData = async () => {
     try {
-      const [booksResponse, popularResponse, myBooksResponse] = await Promise.all([
-        fetch(`${API_BASE}/books?limit=1`),
+      const [statsResponse, popularResponse, myBooksResponse] = await Promise.all([
+        fetch(`${API_BASE}/books/stats`),
         fetch(`${API_BASE}/books/popular`),
         fetch(`${API_BASE}/borrow/my`, { credentials: 'include' })
       ]);
 
-      const booksData = await booksResponse.json();
+      let statsData = null;
+      try {
+        statsData = await statsResponse.json();
+      } catch (_e) {
+        // ignore JSON parse issues and fallback
+      }
       const popularData = await popularResponse.json();
       const myBooksData = await myBooksResponse.json();
 
       const activeBorrows = myBooksData.filter(book => book.status === 'borrowed');
 
-      setStats({
-        totalBooks: booksData.total || 0,
-        availableBooks: booksData.items.reduce((sum, book) => sum + (book.totalCopies - book.borrowedCount), 0),
-        myBorrowedBooks: activeBorrows.length,
-        popularBooks: popularData.slice(0, 5)
-      });
+      if (statsResponse.ok && statsData && typeof statsData.availableBooks === 'number' && typeof statsData.totalBooks === 'number') {
+        setStats({
+          totalBooks: statsData.totalBooks || 0,
+          availableBooks: statsData.availableBooks || 0,
+          myBorrowedBooks: activeBorrows.length,
+          popularBooks: popularData.slice(0, 5)
+        });
+      } else {
+        // Fallback: compute from full books list
+        try {
+          const fallbackResp = await fetch(`${API_BASE}/books?limit=0`);
+          const fallbackData = await fallbackResp.json();
+          const items = Array.isArray(fallbackData.items) ? fallbackData.items : [];
+          const totalTitles = typeof fallbackData.total === 'number' ? fallbackData.total : items.length;
+          const availableCopies = items.reduce((sum, b) => {
+            const total = typeof b.totalCopies === 'number' ? b.totalCopies : 0;
+            const borrowed = typeof b.borrowedCount === 'number' ? b.borrowedCount : 0;
+            const available = Math.max(0, total - borrowed);
+            return sum + available;
+          }, 0);
+          setStats({
+            totalBooks: totalTitles,
+            availableBooks: availableCopies,
+            myBorrowedBooks: activeBorrows.length,
+            popularBooks: popularData.slice(0, 5)
+          });
+        } catch (err) {
+          console.error('Failed to compute fallback stats:', err);
+          setStats(prev => ({ ...prev, myBorrowedBooks: activeBorrows.length, popularBooks: popularData.slice(0, 5) }));
+        }
+      }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -58,7 +88,7 @@ function Dashboard({ user }) {
     <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8">
       <div className="content-wrapper fade-in">
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold text-black mb-4 slide-in-up">
+          <h1 className="text-2xl md:text-3xl font-bold text-black mb-4 slide-in-up">
             Welcome back, <span className="text-gradient">{user.name}</span>!
           </h1>
           <p className="text-lg text-gray-600 slide-in-up" style={{animationDelay: '0.2s'}}>
@@ -67,78 +97,60 @@ function Dashboard({ user }) {
           <div className="w-24 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mx-auto mt-6 slide-in-up" style={{animationDelay: '0.4s'}}></div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div className="modern-card p-8 group hover:scale-105 transition-all duration-500 slide-in-up" style={{animationDelay: '0.6s'}}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <i className="bx bx-library text-2xl text-white group-hover:scale-110 transition-transform duration-300"></i>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-bold text-white">{stats.totalBooks}</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-black mb-1">Total Books</h3>
-                  <p className="text-3xl font-black text-gradient">{stats.totalBooks}</p>
-                  <p className="text-sm text-gray-600">In our collection</p>
-                </div>
+        {/* Stats Tiles (flat colored like screenshot) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* Total Books */}
+          <div className="relative rounded-xl overflow-hidden shadow hover:shadow-lg transition-all duration-500 hover:scale-105 slide-in-up" style={{animationDelay: '0.6s'}}>
+            <div className="bg-sky-500 text-white p-6 h-36 flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div className="text-3xl font-black">{stats.totalBooks}</div>
+                <i className="bx bx-book-open text-6xl opacity-20 -mr-2 -mt-2"></i>
               </div>
+              <div className="text-white/90 text-[16px]">Total Books</div>
             </div>
+            <Link to="/books" className="block bg-sky-600/90 text-white text-sm px-6 py-2 hover:bg-sky-700/90 transition-colors">
+              More info <i className="bx bx-chevron-right align-middle"></i>
+            </Link>
           </div>
 
-          <div className="modern-card p-8 group hover:scale-105 transition-all duration-500 slide-in-up" style={{animationDelay: '0.8s'}}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <i className="bx bx-check-circle text-2xl text-white group-hover:scale-110 transition-transform duration-300"></i>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-bold text-white">{stats.availableBooks}</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-black mb-1">Available Books</h3>
-                  <p className="text-3xl font-black text-gradient">{stats.availableBooks}</p>
-                  <p className="text-sm text-gray-600">Ready to borrow</p>
-                </div>
+          {/* Available Books */}
+          <div className="relative rounded-xl overflow-hidden shadow hover:shadow-lg transition-all duration-500 hover:scale-105 slide-in-up" style={{animationDelay: '0.8s'}}>
+            <div className="bg-emerald-600 text-white p-6 h-36 flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div className="text-3xl font-black">{stats.availableBooks}</div>
+                <i className="bx bx-check-circle text-6xl opacity-20 -mr-2 -mt-2"></i>
               </div>
+              <div className="text-white/90 text-[16px]">Available Books</div>
             </div>
+            <Link to="/books" className="block bg-emerald-700/90 text-white text-sm px-6 py-2 hover:bg-emerald-800/90 transition-colors">
+              More info <i className="bx bx-chevron-right align-middle"></i>
+            </Link>
           </div>
 
-          <div className="modern-card p-8 group hover:scale-105 transition-all duration-500 slide-in-up" style={{animationDelay: '1s'}}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <i className="bx bx-book text-2xl text-white group-hover:scale-110 transition-transform duration-300"></i>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-bold text-white">{stats.myBorrowedBooks}</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-black mb-1">My Books</h3>
-                  <p className="text-3xl font-black text-gradient">{stats.myBorrowedBooks}</p>
-                  <p className="text-sm text-gray-600">Currently borrowed</p>
-                </div>
+          {/* My Books */}
+          <div className="relative rounded-xl overflow-hidden shadow hover:shadow-lg transition-all duration-500 hover:scale-105 slide-in-up" style={{animationDelay: '1s'}}>
+            <div className="bg-orange-500 text-white p-6 h-36 flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div className="text-3xl font-black">{stats.myBorrowedBooks}</div>
+                <i className="bx bx-book text-6xl opacity-20 -mr-2 -mt-2"></i>
               </div>
+              <div className="text-white/90 text-[16px]">My Books</div>
             </div>
+            <Link to="/my-books" className="block bg-orange-600/90 text-white text-sm px-6 py-2 hover:bg-orange-700/90 transition-colors">
+              More info <i className="bx bx-chevron-right align-middle"></i>
+            </Link>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-black mb-8 text-center slide-in-up" style={{animationDelay: '1.2s'}}>
+          <h2 className="text-xl md:text-2xl font-bold text-black mb-8 text-center slide-in-up" style={{animationDelay: '1.2s'}}>
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link
               to="/books"
-              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up"
               style={{animationDelay: '1.4s'}}
             >
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
@@ -151,7 +163,7 @@ function Dashboard({ user }) {
 
             <Link
               to="/my-books"
-              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up "
               style={{animationDelay: '1.6s'}}
             >
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
@@ -164,7 +176,7 @@ function Dashboard({ user }) {
 
             <Link
               to="/orders"
-              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up "
               style={{animationDelay: '1.8s'}}
             >
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
@@ -177,7 +189,7 @@ function Dashboard({ user }) {
 
             <Link
               to="/recommendations"
-              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up floating"
+              className="modern-card p-8 text-center group hover:scale-110 transition-all duration-500 slide-in-up "
               style={{animationDelay: '2s'}}
             >
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg">
@@ -198,14 +210,14 @@ function Dashboard({ user }) {
                 <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
                   <i className="bx bx-trending-up text-xl text-white"></i>
                 </div>
-                <h3 className="text-2xl font-bold text-black">
+                <h3 className="text-xl md:text-2xl font-bold text-black">
                   Trending Books
                 </h3>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {stats.popularBooks.map((book, index) => (
-                <div key={book._id} className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 border border-white/20 hover:border-white/40">
+                <div key={book._id} className="group bg-white/10 backdrop-blur-sm rounded-3xl p-6 hover:bg-black/40 transition-all duration-300 hover:scale-105 border-[1px] border-black/20  hover:border-white/40">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <h4 className="text-lg font-bold text-black truncate group-hover:text-gradient transition-all duration-300">
@@ -216,7 +228,7 @@ function Dashboard({ user }) {
                       </p>
                     </div>
                     <div className="flex flex-col items-center ml-4">
-                      <span className="text-2xl font-black text-gradient">
+                      <span className="text-xl md:text-2xl font-black text-gradient">
                         #{index + 1}
                       </span>
                       <div className="w-8 h-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mt-1"></div>

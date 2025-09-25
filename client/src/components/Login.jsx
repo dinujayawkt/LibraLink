@@ -59,9 +59,9 @@ function Login({ onLogin }) {
     <div className="h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-purple-600/20 rounded-full blur-3xl "></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-600/20 rounded-full blur-3xl " style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl " style={{animationDelay: '2s'}}></div>
       </div>
 
       <div className="max-w-md w-full space-y-6 bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 border border-white/20 relative z-10 fade-in">
@@ -70,27 +70,25 @@ function Login({ onLogin }) {
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl floating">
               <i className="bx bx-library text-3xl text-white"></i>
             </div>
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center animate-pulse">
-              <i className="bx bx-check text-xs text-white"></i>
-            </div>
+           
           </div>
-          <h2 className="text-3xl font-black text-white mb-3 slide-in-up">
+          <h2 className="text-3xl font-black text-white mb-1 ">
             Welcome Back
           </h2>
-          <p className="text-lg text-white/80 mb-2 slide-in-up" style={{animationDelay: '0.2s'}}>
-            Sign in to <span className="text-gradient font-bold">LibraLink</span>
+          <p className="text-sm text-white/80 mb-2 " style={{animationDelay: '0.2s'}}>
+            Sign in to <span className="text-gradient2 text-xl font-bold"> LibraLink</span>
           </p>
-          <p className="text-sm text-white/60 slide-in-up" style={{animationDelay: '0.4s'}}>
+          <p className="text-[13px] text-white/80 " style={{animationDelay: '0.4s'}}>
             Or{' '}
-            <Link to="/register" className="text-gradient hover:text-white font-semibold underline underline-offset-4 transition-all duration-300">
-              create a new account
+            <Link to="/register" className="text-gradient2 font-bold style={{color: '#6062d6'}}">
+              Create a new account
             </Link>
           </p>
         </div>
         
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div className="slide-in-up" style={{animationDelay: '0.6s'}}>
+            <div className="" style={{animationDelay: '0.6s'}}>
               <label htmlFor="email" className="block text-sm font-semibold text-white mb-2">
                 Email Address
               </label>
@@ -100,15 +98,14 @@ function Login({ onLogin }) {
                   name="email"
                   type="email"
                   required
-                  className="modern-input pl-10"
+                  className="modern-input pl-12"
                   placeholder="Enter your email address"
                   value={formData.email}
                   onChange={handleChange}
                 />
-                <i className="bx bx-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-sm"></i>
               </div>
             </div>
-            <div className="slide-in-up" style={{animationDelay: '0.8s'}}>
+            <div >
               <label htmlFor="password" className="block text-sm font-semibold text-white mb-2">
                 Password
               </label>
@@ -123,13 +120,12 @@ function Login({ onLogin }) {
                   value={formData.password}
                   onChange={handleChange}
                 />
-                <i className="bx bx-lock-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-sm"></i>
               </div>
             </div>
           </div>
 
           {error && (
-            <div className="slide-in-up" style={{animationDelay: '1s'}}>
+            <div >
               <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-200 text-center p-3 rounded-xl flex items-center justify-center space-x-2">
                 <i className="bx bx-error-circle text-sm"></i>
                 <span className="text-sm font-medium">{error}</span>
@@ -137,7 +133,7 @@ function Login({ onLogin }) {
             </div>
           )}
 
-          <div className="slide-in-up" style={{animationDelay: '1.2s'}}>
+          <div >
             <button
               type="submit"
               disabled={loading}

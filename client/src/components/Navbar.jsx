@@ -43,12 +43,12 @@ function Navbar({ user, onLogout }) {
   }
 
   return (
-    <nav className="bg-black shadow-lg border-b border-gray-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-        <div className="flex justify-between items-center h-16">
+    <nav className="sticky top-0 z-50 bg-black border-b border-gray-800">
+      <div className="max-w-7xl mx-auto px-2 lg:px-3">
+        <div className="flex justify-between items-center h-18">
           {/* Logo */}
-          <div className="flex items-center group">
-            <Link to="/" className="flex items-center space-x-2 group-hover:scale-105 transition-transform duration-300">
+          <div className="flex items-center group flex-shrink-0 ml-[-150px] mr-[50px]">
+            <Link to="/" className="flex items-center space-x-3 group-hover:scale-105 transition-transform duration-300">
               <div className="relative">
                 <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <i className="bx bx-library text-lg text-white"></i>
@@ -56,29 +56,29 @@ function Navbar({ user, onLogout }) {
                 <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full animate-pulse"></div>
               </div>
               <div>
-                <span className="text-xl font-bold text-white group-hover:text-gradient transition-all duration-300">
+                <span className="text-lg font-bold text-white group-hover:text-gradient transition-all duration-300">
                   LibraLink
                 </span>
-                <div className="text-xs text-white/70 font-medium hidden sm:block">Digital Library</div>
+                <div className="text-[10px] text-white/70 font-medium hidden sm:block">Digital Library</div>
               </div>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-3">
             {(user?.role === 'member') && (
               <>
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`flex items-center space-x-2.5 px-5 py-2 text-xs font-medium rounded-xl transition-all duration-200 ${
                       isActive(item.path)
-                        ? 'bg-white text-black'
-                        : 'text-white hover:bg-gray-800 hover:text-white'
+                        ? 'bg-white text-black shadow'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <i className={`bx ${item.icon} text-base`}></i>
+                    <i className={`bx ${item.icon} text-sm`}></i>
                     <span className="hidden xl:block">{item.label}</span>
                   </Link>
                 ))}
@@ -93,13 +93,13 @@ function Navbar({ user, onLogout }) {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    className={`flex items-center space-x-2.5 px-5 py-2 text-xs font-medium rounded-xl transition-all duration-200 ${
                       isActive(item.path)
-                        ? 'bg-white text-black'
-                        : 'text-white hover:bg-gray-800 hover:text-white'
+                        ? 'bg-white text-black shadow'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <i className={`bx ${item.icon} text-base`}></i>
+                    <i className={`bx ${item.icon} text-sm`}></i>
                     <span className="hidden xl:block">{item.label}</span>
                   </Link>
                 ))}
@@ -108,23 +108,23 @@ function Navbar({ user, onLogout }) {
           </div>
 
           {/* User Menu & Actions */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-8 flex-shrink-0 mr-[-150px] ">
             {/* Wishlist Icon - Only for members */}
             {user?.role === 'member' && (
               <Link
                 to="/wishlist"
-                className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors"
+                className="w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 rounded-full flex items-center justify-center transition-colors shadow-lg"
                 title="Wishlist"
               >
-                <i className="bx bx-heart text-red-600 text-sm"></i>
+                <i className="bx bxs-heart text-white text-sm"></i>
               </Link>
             )}
 
             {/* Profile Dropdown */}
-            <div className="relative" ref={profileRef}>
+            <div className="relative" ref={profileRef} >
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center space-x-2 hover:bg-gray-800 rounded-lg px-2 py-1 transition-colors"
+                className="flex items-center space-x-3 bg-gray-900 hover:bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 transition-colors"
               >
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs ${
                   user.role === 'admin' ? 'bg-red-600' :
@@ -134,10 +134,10 @@ function Navbar({ user, onLogout }) {
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="hidden lg:block text-left">
-                  <div className="text-sm font-medium text-white">{user.name}</div>
-                  <div className="text-xs text-gray-300 capitalize">{user.role}</div>
+                  <div className="text-xs font-medium text-white">{user.name}</div>
+                  <div className="text-[10px] text-gray-300 capitalize">{user.role}</div>
                 </div>
-                <i className="bx bx-chevron-down text-white text-xs"></i>
+                <i className="bx bx-chevron-down text-white text-[10px]"></i>
               </button>
 
               {/* Profile Dropdown Menu */}
@@ -177,20 +177,20 @@ function Navbar({ user, onLogout }) {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-gray-900 border-t border-gray-700">
+        <div className="lg:hidden bg-gray-900 border-t border-gray-800">
           <div className="px-4 pt-3 pb-4 space-y-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${
+                className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold ${
                   isActive(item.path)
-                    ? 'bg-white text-black'
-                    : 'text-white hover:bg-gray-800'
+                    ? 'bg-white text-black shadow'
+                    : 'text-white/90 hover:text-white hover:bg-gray-800'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                <i className={`bx ${item.icon} text-base`}></i>
+                <i className={`bx ${item.icon} text-sm`}></i>
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -203,14 +203,14 @@ function Navbar({ user, onLogout }) {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold ${
                       isActive(item.path)
-                        ? 'bg-white text-black'
-                        : 'text-white hover:bg-gray-800'
+                        ? 'bg-white text-black shadow'
+                        : 'text-white/90 hover:text-white hover:bg-gray-800'
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <i className={`bx ${item.icon} text-base`}></i>
+                    <i className={`bx ${item.icon} text-sm`}></i>
                     <span>{item.label}</span>
                   </Link>
                 ))}
@@ -225,7 +225,7 @@ function Navbar({ user, onLogout }) {
                   className="flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-semibold text-white hover:bg-gray-800 mb-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <i className="bx bx-heart text-xl"></i>
+                  <i className="bx bxs-heart text-xl"></i>
                   <span>Wishlist</span>
                 </Link>
               )}
