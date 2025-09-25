@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from './ToastProvider';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 
 function CommunityChat({ user }) {
   const { communityId } = useParams();
