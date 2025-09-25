@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 
 const API_BASE = 'http://localhost:4000/api';
 
@@ -7,11 +8,13 @@ function AdminBooks({ user }) {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
+  const toast = useToast();
   const [formData, setFormData] = useState({
     title: '',
     author: '',
     isbn: '',
     category: '',
+    coverUrl: '',
     totalCopies: 1,
     locationCode: ''
   });
@@ -52,17 +55,17 @@ function AdminBooks({ user }) {
       });
 
       if (response.ok) {
-        alert(editingBook ? 'Book updated successfully!' : 'Book added successfully!');
-        setFormData({ title: '', author: '', isbn: '', category: '', totalCopies: 1, locationCode: '' });
+        toast.success(editingBook ? 'Book updated successfully!' : 'Book added successfully!');
+        setFormData({ title: '', author: '', isbn: '', category: '', coverUrl: '', totalCopies: 1, locationCode: '' });
         setShowAddForm(false);
         setEditingBook(null);
         fetchBooks();
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Operation failed');
+        toast.error(errorData.message || 'Operation failed');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     }
   };
 
@@ -73,6 +76,7 @@ function AdminBooks({ user }) {
       author: book.author,
       isbn: book.isbn || '',
       category: book.category || '',
+      coverUrl: book.coverUrl || '',
       totalCopies: book.totalCopies,
       locationCode: book.locationCode || ''
     });
@@ -89,43 +93,51 @@ function AdminBooks({ user }) {
       });
 
       if (response.ok) {
-        alert('Book deleted successfully!');
+        toast.success('Book deleted successfully!');
         fetchBooks();
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to delete book');
+        toast.error(errorData.message || 'Failed to delete book');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     }
   };
 
   const handleCancel = () => {
     setShowAddForm(false);
     setEditingBook(null);
-    setFormData({ title: '', author: '', isbn: '', category: '', totalCopies: 1, locationCode: '' });
+    setFormData({ title: '', author: '', isbn: '', category: '', coverUrl: '', totalCopies: 1, locationCode: '' });
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-700"></div>
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-4"></div>
+          <p className="text-white/80 text-lg font-medium">Loading books...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-5 bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/30">
+      <div className="content-wrapper fade-in">
         <div className="mb-8">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-black">📚 Manage Books</h1>
-              <p className="mt-1 text-sm text-gray-700">Add, edit, and delete books in LibraLink</p>
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mr-3">
+                <i className="bx bx-library text-white"></i>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-black"><span className="text-gradient">Manage Books</span></h1>
+                <p className="mt-1 text-sm text-gray-700">Add, edit, and delete books in LibraLink</p>
+              </div>
             </div>
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 font-medium"
+              className="modern-btn modern-btn-primary"
             >
               + Add New Book
             </button>
@@ -134,7 +146,7 @@ function AdminBooks({ user }) {
 
         {/* Add/Edit Form */}
         {showAddForm && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 mb-8 border border-gray-200 shadow-lg">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 mb-8 border border-gray-200 shadow-lg slide-in-up">
             <h2 className="text-lg font-semibold text-black mb-3">
               {editingBook ? 'Edit Book' : 'Add New Book'}
             </h2>
@@ -148,7 +160,7 @@ function AdminBooks({ user }) {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-sm"
+                  className="modern-input"
                   placeholder="Enter book title"
                 />
               </div>
@@ -162,7 +174,7 @@ function AdminBooks({ user }) {
                   required
                   value={formData.author}
                   onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-sm"
+                  className="modern-input"
                   placeholder="Enter author name"
                 />
               </div>
@@ -175,7 +187,7 @@ function AdminBooks({ user }) {
                   type="text"
                   value={formData.isbn}
                   onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-sm"
+                  className="modern-input"
                   placeholder="Enter ISBN"
                 />
               </div>
@@ -188,9 +200,30 @@ function AdminBooks({ user }) {
                   type="text"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-sm"
+                  className="modern-input"
                   placeholder="Enter category"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-black mb-1">
+                  Cover Image URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.coverUrl}
+                  onChange={(e) => setFormData({ ...formData, coverUrl: e.target.value })}
+                  className="modern-input"
+                  placeholder="Paste image URL (e.g., https://...)"
+                />
+                {formData.coverUrl && (
+                  <div className="mt-2 flex items-center space-x-3">
+                    <div className="w-12 h-16 rounded overflow-hidden border border-gray-200 shadow-sm">
+                      <img src={formData.coverUrl} alt="Cover preview" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-xs text-gray-600 truncate">Preview</span>
+                  </div>
+                )}
               </div>
               
               <div>
@@ -203,7 +236,7 @@ function AdminBooks({ user }) {
                   required
                   value={formData.totalCopies}
                   onChange={(e) => setFormData({ ...formData, totalCopies: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-sm"
+                  className="modern-input"
                 />
               </div>
               
@@ -215,7 +248,7 @@ function AdminBooks({ user }) {
                   type="text"
                   value={formData.locationCode}
                   onChange={(e) => setFormData({ ...formData, locationCode: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-sm"
+                  className="modern-input"
                   placeholder="Enter location code"
                 />
               </div>
@@ -224,14 +257,14 @@ function AdminBooks({ user }) {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="bg-white text-black border-2 border-black px-6 py-3 rounded-lg hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 font-medium flex items-center space-x-2"
+                  className="modern-btn modern-btn-secondary flex items-center space-x-2"
                 >
                   <i className="bx bx-x text-lg"></i>
                   <span>Cancel</span>
                 </button>
                 <button
                   type="submit"
-                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 font-medium flex items-center space-x-2"
+                  className="modern-btn modern-btn-primary flex items-center space-x-2"
                 >
                   <i className="bx bx-check text-lg"></i>
                   <span>{editingBook ? 'Update Book' : 'Add Book'}</span>
@@ -242,7 +275,7 @@ function AdminBooks({ user }) {
         )}
 
         {/* Books List */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden border border-gray-200">
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden border border-gray-200 slide-in-up">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -265,10 +298,10 @@ function AdminBooks({ user }) {
                 <tr key={book._id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-black">{book.title}</div>
-                      <div className="text-xs text-gray-600">by {book.author}</div>
+                      <div className="text-sm font-medium text-black truncate max-w-xs">{book.title}</div>
+                      <div className="text-xs text-gray-600 truncate max-w-xs">by {book.author}</div>
                       {book.category && (
-                        <div className="text-xs text-gray-500">{book.category}</div>
+                        <div className="text-xs text-gray-500 truncate max-w-xs">{book.category}</div>
                       )}
                       {book.isbn && (
                         <div className="text-xs text-gray-400">ISBN: {book.isbn}</div>

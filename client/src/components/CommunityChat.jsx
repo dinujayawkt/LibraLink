@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useToast } from './ToastProvider';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:4000/api';
@@ -6,6 +7,7 @@ const API_BASE = 'http://localhost:4000/api';
 function CommunityChat({ user }) {
   const { communityId } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const [community, setCommunity] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -15,6 +17,9 @@ function CommunityChat({ user }) {
   const [hasMore, setHasMore] = useState(true);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const [replyingToId, setReplyingToId] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [expandedReplies, setExpandedReplies] = useState({});
 
   useEffect(() => {
     if (communityId) {
@@ -64,7 +69,7 @@ function CommunityChat({ user }) {
       } else {
         const errorData = await response.json();
         if (errorData.message === 'You are not a member of this community') {
-          alert('You are not a member of this community');
+          toast.error('You are not a member of this community');
           navigate('/community');
         }
       }
@@ -99,12 +104,59 @@ function CommunityChat({ user }) {
         setNewMessage('');
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to send message');
+        toast.error(errorData.message || 'Failed to send message');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleStartReply = (messageId) => {
+    setReplyingToId(messageId);
+    setReplyText('');
+    setExpandedReplies((prev) => ({ ...prev, [messageId]: true }));
+  };
+
+  const handleCancelReply = () => {
+    setReplyingToId(null);
+    setReplyText('');
+  };
+
+  const handleSubmitReply = async (e, messageId) => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+    try {
+      const response = await fetch(`${API_BASE}/communities/messages/${messageId}/reply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ content: replyText.trim() })
+      });
+
+      if (response.ok) {
+        const newReply = {
+          _id: Math.random().toString(36).slice(2),
+          user: { _id: user.id, name: user.name },
+          content: replyText.trim(),
+          createdAt: new Date().toISOString()
+        };
+        setMessages((prev) => prev.map((m) => {
+          if (m._id !== messageId) return m;
+          const currentReplies = Array.isArray(m.replies) ? m.replies : [];
+          return { ...m, replies: [...currentReplies, newReply] };
+        }));
+        setReplyText('');
+        setReplyingToId(null);
+      } else {
+        const errorData = await response.json();
+        // no notifications for reply system per requirement
+      }
+    } catch (error) {
+      // silent failure for reply per requirement
     }
   };
 
@@ -225,7 +277,7 @@ function CommunityChat({ user }) {
                     
                     {/* Message Actions */}
                     <div className="flex items-center space-x-3 sm:space-x-4 mt-1 sm:mt-2 text-xs text-gray-500">
-                      <button className="hover:text-gray-700 flex items-center space-x-1">
+                      <button onClick={() => handleStartReply(message._id)} className="hover:text-gray-700 flex items-center space-x-1">
                         <i className="bx bx-reply"></i>
                         <span className="hidden sm:inline">Reply</span>
                       </button>
@@ -234,11 +286,47 @@ function CommunityChat({ user }) {
                         <span className="hidden sm:inline">React</span>
                       </button>
                       {message.replies && message.replies.length > 0 && (
-                        <span className="text-blue-600">
-                          {message.replies.length} replies
-                        </span>
+                        <button
+                          onClick={() => setExpandedReplies(prev => ({...prev, [message._id]: !prev[message._id]}))}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          {expandedReplies[message._id] ? 'Hide' : 'Show'} {message.replies.length} replies
+                        </button>
                       )}
                     </div>
+                    {/* Replies */}
+                    {message.replies && message.replies.length > 0 && expandedReplies[message._id] && (
+                      <div className="mt-2 space-y-2">
+                        {message.replies.map((r) => (
+                          <div key={r._id} className="ml-6 sm:ml-8 bg-gray-50 rounded-lg p-2 sm:p-3 border border-gray-200">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <div className="w-5 h-5 bg-gray-700 text-white rounded-full flex items-center justify-center text-[10px]">
+                                {r.user?.name ? r.user.name.charAt(0).toUpperCase() : '?'}
+                              </div>
+                              <span className="text-xs font-semibold text-black">{r.user?.name || 'User'}</span>
+                              <span className="text-[10px] text-gray-500">{formatTime(r.createdAt)}</span>
+                            </div>
+                            <div className="text-xs text-gray-700 whitespace-pre-wrap">{r.content}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Reply input */}
+                    {replyingToId === message._id && (
+                      <form onSubmit={(e) => handleSubmitReply(e, message._id)} className="mt-2 flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder="Write a reply..."
+                          className="modern-input text-xs sm:text-sm"
+                          maxLength={500}
+                        />
+                        <button type="submit" className="modern-btn modern-btn-primary text-xs">Reply</button>
+                        <button type="button" onClick={handleCancelReply} className="modern-btn modern-btn-secondary text-xs">Cancel</button>
+                      </form>
+                    )}
                   </div>
                 </div>
               ))

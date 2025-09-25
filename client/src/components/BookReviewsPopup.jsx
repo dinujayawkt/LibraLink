@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 
 const API_BASE = 'http://localhost:4000/api';
 
@@ -15,6 +16,7 @@ function BookReviewsPopup({ book, isOpen, onClose, canWriteReview = false }) {
     content: ''
   });
   const [submitting, setSubmitting] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     if (isOpen && book) {
@@ -76,15 +78,15 @@ function BookReviewsPopup({ book, isOpen, onClose, canWriteReview = false }) {
         setNewReview({ rating: 5, title: '', content: '' });
         fetchReviews();
         fetchStats();
-        alert('Review submitted successfully!');
+        toast.success('Review submitted successfully!');
       } else {
         const errorData = await response.json();
         console.log('Error response:', errorData);
-        alert(errorData.message || 'Failed to submit review');
+        toast.error(errorData.message || 'Failed to submit review');
       }
     } catch (error) {
       console.error('Network error:', error);
-      alert(`Network error: ${error.message}. Please check if the server is running.`);
+      toast.error(`Network error: ${error.message}. Please check if the server is running.`);
     } finally {
       setSubmitting(false);
     }

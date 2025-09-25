@@ -53,4 +53,6 @@ router.get('/borrows', requireAuth, requireRole('admin', 'assistant'), async (re
   }
 });
 
+// (Reverted) No extension decision endpoint
+
 export default router;

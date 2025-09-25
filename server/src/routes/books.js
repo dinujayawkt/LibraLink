@@ -29,6 +29,45 @@ router.get('/popular', async (_req, res) => {
   }
 });
 
+// Stats: totals across all books (copies-based)
+router.get('/stats', async (_req, res) => {
+  try {
+    const [totalBooks, aggregates] = await Promise.all([
+      Book.countDocuments({}),
+      Book.aggregate([
+        {
+          $project: {
+            available: {
+              $max: [
+                {
+                  $subtract: [
+                    { $ifNull: ['$totalCopies', 0] },
+                    { $ifNull: ['$borrowedCount', 0] }
+                  ]
+                },
+                0
+              ]
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            availableBooks: { $sum: '$available' }
+          }
+        }
+      ])
+    ]);
+
+    const totals = aggregates[0] || { availableBooks: 0 };
+    const availableBooks = totals.availableBooks || 0;
+
+    res.json({ totalBooks, availableBooks });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 router.post('/', requireAuth, requireRole('assistant', 'admin'), async (req, res) => {
   try {
     const book = await Book.create(req.body);

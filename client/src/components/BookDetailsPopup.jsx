@@ -79,7 +79,7 @@ function BookDetailsPopup({ book, isOpen, onClose, onViewReviews }) {
             <div className="flex space-x-3 pt-4">
               <button 
                 onClick={() => onViewReviews && onViewReviews(book)}
-                className="flex-1 modern-btn modern-btn-secondary flex items-center justify-center space-x-2"
+                className="flex-1 modern-btn bg-gray-900 text-white hover:bg-gray-800 flex items-center justify-center space-x-2"
               >
                 <i className="bx bx-star text-lg"></i>
                 <span>View Reviews</span>

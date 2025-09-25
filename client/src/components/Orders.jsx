@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 
 const API_BASE = 'http://localhost:4000/api';
 
@@ -14,6 +15,7 @@ function Orders({ user }) {
     notes: ''
   });
   const [submitting, setSubmitting] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     fetchOrders();
@@ -49,16 +51,16 @@ function Orders({ user }) {
       });
 
       if (response.ok) {
-        alert('Book order submitted successfully!');
+        toast.success('Book order submitted successfully!');
         setNewOrder({ title: '', author: '', isbn: '', notes: '' });
         setShowNewOrderForm(false);
         fetchOrders(); // Refresh the list
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to submit order');
+        toast.error(errorData.message || 'Failed to submit order');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -103,9 +105,10 @@ function Orders({ user }) {
             </div>
             <button
               onClick={() => setShowNewOrderForm(!showNewOrderForm)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="modern-btn modern-btn-primary flex items-center space-x-2"
             >
-              {showNewOrderForm ? 'Cancel' : '+ New Order'}
+              <i className="bx bx-plus text-lg"></i>
+              <span>{showNewOrderForm ? 'Cancel' : 'New Order'}</span>
             </button>
           </div>
         </div>
@@ -198,9 +201,10 @@ function Orders({ user }) {
             <p className="text-gray-500 mb-4">Request a book to get started</p>
             <button
               onClick={() => setShowNewOrderForm(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="modern-btn modern-btn-primary inline-flex items-center space-x-2"
             >
-              Request Your First Book
+              <i className="bx bx-plus text-lg"></i>
+              <span>Request Your First Book</span>
             </button>
           </div>
         ) : (

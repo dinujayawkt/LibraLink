@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 
 const API_BASE = 'http://localhost:4000/api';
 
 function AdminUsers({ user }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   useEffect(() => {
     fetchUsers();
@@ -35,14 +37,14 @@ function AdminUsers({ user }) {
       });
 
       if (response.ok) {
-        alert('User deleted successfully!');
+        toast.success('User deleted successfully!');
         fetchUsers();
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to delete user');
+        toast.error(errorData.message || 'Failed to delete user');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     }
   };
 
@@ -58,14 +60,14 @@ function AdminUsers({ user }) {
       });
 
       if (response.ok) {
-        alert(`User ${!currentStatus ? 'blocked' : 'unblocked'} successfully!`);
+        toast.success(`User ${!currentStatus ? 'blocked' : 'unblocked'} successfully!`);
         fetchUsers();
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to update user status');
+        toast.error(errorData.message || 'Failed to update user status');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     }
   };
 
@@ -81,26 +83,32 @@ function AdminUsers({ user }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-4"></div>
+          <p className="text-white/80 text-lg font-medium">Loading users...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8">
-      <div className="content-wrapper">
-        <div className="mb-8">
-          <div className="flex items-center mb-2">
-            <i className="bx bx-user text-3xl text-black mr-3"></i>
-            <h1 className="text-4xl font-bold text-black">Manage Users</h1>
+      <div className="content-wrapper fade-in">
+        <div className="mb-8 text-center slide-in-up">
+          <div className="flex items-center justify-center mb-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg mr-3">
+              <i className="bx bx-user text-white"></i>
+            </div>
+            <h1 className="text-3xl font-bold text-black"><span className="text-gradient">Manage Users</span></h1>
           </div>
           <p className="text-lg text-gray-600">View and manage all LibraLink users</p>
+          <div className="w-20 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto mt-3"></div>
         </div>
 
         {/* Users List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {users.map((user) => (
-            <div key={user._id} className="modern-card p-6 group hover:scale-105 transition-transform duration-200">
+            <div key={user._id} className="modern-card p-6 group hover:scale-105 transition-transform duration-200 slide-in-up">
               <div className="flex items-center mb-6">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl ${
                   user.role === 'admin' ? 'bg-red-600' :

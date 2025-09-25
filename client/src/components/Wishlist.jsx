@@ -45,9 +45,9 @@ function Wishlist({ user }) {
         <div className="mb-8">
           <div className="flex items-center mb-2">
             <i className="bx bx-heart text-3xl text-red-500 mr-3"></i>
-            <h1 className="text-4xl font-bold text-black">My Wishlist</h1>
+            <h1 className="text-3xl font-bold text-black">My Wishlist</h1>
           </div>
-          <p className="text-lg text-gray-600">Books you want to read</p>
+          <p className="text-sm text-gray-600">Books you want to read</p>
         </div>
 
         {wishlist.length === 0 ? (

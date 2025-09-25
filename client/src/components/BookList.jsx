@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 import BookDetailsPopup from './BookDetailsPopup';
 import BookReviewsPopup from './BookReviewsPopup';
 
@@ -6,10 +7,14 @@ const API_BASE = 'http://localhost:4000/api';
 
 function BookList({ user }) {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('');
   const [author, setAuthor] = useState('');
+  const [appliedSearchTerm, setAppliedSearchTerm] = useState('');
+  const [appliedCategory, setAppliedCategory] = useState('');
+  const [appliedAuthor, setAppliedAuthor] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,11 +24,12 @@ function BookList({ user }) {
   const [showPopup, setShowPopup] = useState(false);
   const [showReviewsPopup, setShowReviewsPopup] = useState(false);
   const [wishlist, setWishlist] = useState([]);
+  const toast = useToast();
 
   useEffect(() => {
     fetchBooks();
     loadWishlist();
-  }, [searchTerm, category, author, sortBy, sortOrder, currentPage]);
+  }, [appliedSearchTerm, appliedCategory, appliedAuthor, sortBy, sortOrder, currentPage]);
 
   const loadWishlist = () => {
     const savedWishlist = localStorage.getItem('wishlist');
@@ -70,11 +76,11 @@ function BookList({ user }) {
 
   const fetchBooks = async () => {
     try {
-      setLoading(true);
+      setIsFetching(true);
       const params = new URLSearchParams({
-        q: searchTerm,
-        category,
-        author,
+        q: appliedSearchTerm,
+        category: appliedCategory,
+        author: appliedAuthor,
         sort: sortBy,
         order: sortOrder,
         page: currentPage,
@@ -89,7 +95,8 @@ function BookList({ user }) {
     } catch (error) {
       console.error('Failed to fetch books:', error);
     } finally {
-      setLoading(false);
+      setIsFetching(false);
+      setInitialLoad(false);
     }
   };
 
@@ -109,14 +116,14 @@ function BookList({ user }) {
       });
 
       if (response.ok) {
-        alert('Book borrowed successfully!');
+        toast.success('Book borrowed successfully!');
         fetchBooks(); // Refresh the list
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to borrow book');
+        toast.error(errorData.message || 'Failed to borrow book');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setBorrowing(prev => ({ ...prev, [bookId]: false }));
     }
@@ -125,89 +132,106 @@ function BookList({ user }) {
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchBooks();
+    setAppliedSearchTerm(searchTerm);
+    setAppliedCategory(category);
+    setAppliedAuthor(author);
   };
 
   const clearFilters = () => {
     setSearchTerm('');
     setCategory('');
     setAuthor('');
+    setAppliedSearchTerm('');
+    setAppliedCategory('');
+    setAppliedAuthor('');
     setCurrentPage(1);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // Removed full-page loading return to prevent the entire search box from reloading
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8">
-      <div className="content-wrapper">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-black mb-2">Browse Books</h1>
-          <p className="text-sm text-gray-600">Search and discover books in LibraLink</p>
+      <div className="content-wrapper fade-in">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-black mb-3 slide-in-up">
+            Explore Our <span className="text-gradient">Library</span>
+          </h1>
+          <p className="text-base md:text-lg text-gray-600 slide-in-up" style={{animationDelay: '0.2s'}}>
+            Discover thousands of books waiting to be explored
+          </p>
+          <div className="w-24 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mx-auto mt-6 slide-in-up" style={{animationDelay: '0.4s'}}></div>
         </div>
 
         {/* Search and Filters */}
-        <div className="modern-card p-6 mb-6">
+        <div className="modern-card p-5 md:p-6 mb-6 slide-in-up" style={{animationDelay: '0.6s'}}>
+          <div className="text-center mb-6">
+            <h2 className="text-lg md:text-xl font-bold text-black mb-1">Find Your Next Read</h2>
+            <p className="text-sm text-gray-600">Search through our extensive collection</p>
+          </div>
           <form onSubmit={handleSearch} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-black mb-1">
-                  Search
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-1.5">
+                <label className="block text-sm md:text-base font-semibold text-black mb-2">
+                  <i className="bx bx-search mr-2"></i>Search
                 </label>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by title, author, or ISBN..."
-                  className="modern-input"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search by title, author, or ISBN..."
+                    className="modern-input h-10 md:h-11 pl-10 md:pl-12 text-sm"
+                  />
+                  <i className="bx bx-search absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-base md:text-lg"></i>
+                </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-semibold text-black mb-1">
-                  Category
+              <div className="space-y-1.5">
+                <label className="block text-sm md:text-base font-semibold text-black mb-2">
+                  <i className="bx bx-category mr-2"></i>Category
                 </label>
-                <input
-                  type="text"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  placeholder="e.g., Fiction, Science"
-                  className="modern-input"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    placeholder="e.g., Fiction, Science"
+                    className="modern-input h-10 md:h-11 pl-10 md:pl-12 text-sm"
+                  />
+                  <i className="bx bx-category absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-base md:text-lg"></i>
+                </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-semibold text-black mb-1">
-                  Author
+              <div className="space-y-1.5">
+                <label className="block text-sm md:text-base font-semibold text-black mb-2">
+                  <i className="bx bx-user mr-2"></i>Author
                 </label>
-                <input
-                  type="text"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  placeholder="Author name"
-                  className="modern-input"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={author}
+                    onChange={(e) => setAuthor(e.target.value)}
+                    placeholder="Author name"
+                    className="modern-input h-10 md:h-11 pl-10 md:pl-12 text-sm"
+                  />
+                  <i className="bx bx-user absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-base md:text-lg"></i>
+                </div>
               </div>
               
-              <div className="flex items-end space-x-3">
+              <div className="flex items-end space-x-2 md:space-x-3">
                 <button
                   type="submit"
-                  className="flex-1 modern-btn modern-btn-primary flex items-center justify-center space-x-2"
+                  className="flex-1 modern-btn modern-btn-primary h-10 md:h-11 text-sm flex items-center justify-center space-x-2 group"
                 >
-                  <i className="bx bx-search text-lg"></i>
+                  <i className="bx bx-search text-base md:text-lg group-hover:scale-110 transition-transform duration-300"></i>
                   <span>Search</span>
                 </button>
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="modern-btn modern-btn-secondary flex items-center justify-center space-x-2"
+                  className="modern-btn modern-btn-secondary h-10 md:h-11 text-sm flex items-center justify-center space-x-2 group"
                 >
-                  <i className="bx bx-x text-lg"></i>
+                  <i className="bx bx-x text-base md:text-lg group-hover:scale-110 transition-transform duration-300"></i>
                   <span>Clear</span>
                 </button>
               </div>
@@ -215,13 +239,15 @@ function BookList({ user }) {
           </form>
 
           {/* Sort Options */}
-          <div className="mt-6 flex flex-wrap items-center gap-6">
-            <div className="flex items-center space-x-3">
-              <label className="text-sm font-semibold text-black">Sort by:</label>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-6">
+            <div className="flex items-center space-x-4">
+              <label className="text-sm md:text-base font-semibold text-black flex items-center whitespace-nowrap">
+                <i className="bx bx-sort-alt-2 mr-2"></i>Sort by:
+              </label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="modern-input py-2"
+                className="modern-input h-10 md:h-11 text-sm px-3 md:px-4 min-w-[140px]"
               >
                 <option value="createdAt">Date Added</option>
                 <option value="title">Title</option>
@@ -230,12 +256,14 @@ function BookList({ user }) {
               </select>
             </div>
             
-            <div className="flex items-center space-x-3">
-              <label className="text-sm font-semibold text-black">Order:</label>
+            <div className="flex items-center space-x-4">
+              <label className="text-sm md:text-base font-semibold text-black flex items-center">
+                <i className="bx bx-sort mr-2"></i>Order:
+              </label>
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="modern-input py-2"
+                className="modern-input h-10 md:h-11 text-sm px-3 md:px-4 min-w-[140px]"
               >
                 <option value="desc">Descending</option>
                 <option value="asc">Ascending</option>
@@ -245,7 +273,15 @@ function BookList({ user }) {
         </div>
 
         {/* Books Grid */}
-        {books.length === 0 ? (
+        {initialLoad ? (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="loading-spinner"></div>
+            </div>
+            <h3 className="text-xl font-bold text-black mb-2">Discovering Books</h3>
+            <p className="text-sm text-gray-600">Loading our amazing collection...</p>
+          </div>
+        ) : books.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <i className="bx bx-book text-4xl text-gray-400"></i>
@@ -254,9 +290,15 @@ function BookList({ user }) {
             <p className="text-sm text-gray-600">Try adjusting your search criteria</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {books.map((book) => (
-              <div key={book._id} className="modern-card p-4 group hover:scale-105 transition-transform duration-200">
+          <div className="relative">
+            {isFetching && (
+              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-xl">
+                <div className="loading-spinner"></div>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {books.map((book) => (
+                <div key={book._id} className="modern-card p-4 group hover:scale-105 transition-transform duration-200">
                 <div className="text-center mb-6">
                   {/* Book Cover Image */}
                   <div className="w-24 h-36 mx-auto mb-3 rounded-lg overflow-hidden shadow-lg">
@@ -348,35 +390,40 @@ function BookList({ user }) {
                   )}
                 </div>
               </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-8 flex justify-center">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="modern-btn modern-btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <i className="bx bx-chevron-left text-lg"></i>
-                <span>Previous</span>
-              </button>
-              
-              <span className="px-4 py-2 text-sm font-semibold text-black">
-                Page {currentPage} of {totalPages}
-              </span>
-              
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="modern-btn modern-btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span>Next</span>
-                <i className="bx bx-chevron-right text-lg"></i>
-              </button>
+          <div className="mt-12 flex justify-center slide-in-up" style={{animationDelay: '1s'}}>
+            <div className="modern-card p-6">
+              <div className="flex items-center space-x-6">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="modern-btn modern-btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                  <i className="bx bx-chevron-left text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                  <span>Previous</span>
+                </button>
+                
+                <div className="flex items-center space-x-2">
+                  <span className="px-6 py-3 text-lg font-bold text-black bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl border border-indigo-500/30">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                </div>
+                
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="modern-btn modern-btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                  <span>Next</span>
+                  <i className="bx bx-chevron-right text-lg group-hover:scale-110 transition-transform duration-300"></i>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -402,3 +449,6 @@ function BookList({ user }) {
 }
 
 export default BookList;
+
+
+

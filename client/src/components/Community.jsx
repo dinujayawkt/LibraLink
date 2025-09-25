@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 import { Link } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:4000/api';
@@ -7,9 +8,13 @@ function Community({ user }) {
   const [communities, setCommunities] = useState([]);
   const [myCommunities, setMyCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [appliedSearchTerm, setAppliedSearchTerm] = useState('');
+  const [appliedSelectedCategory, setAppliedSelectedCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [joining, setJoining] = useState({});
@@ -22,22 +27,23 @@ function Community({ user }) {
     maxMembers: 100,
     rules: []
   });
+  const toast = useToast();
 
   useEffect(() => {
     fetchCommunities();
     fetchMyCommunities();
-  }, [activeTab, searchTerm, selectedCategory, currentPage]);
+  }, [activeTab, appliedSearchTerm, appliedSelectedCategory, currentPage]);
 
   const fetchCommunities = async () => {
     try {
-      setLoading(true);
+      setIsFetching(true);
       const params = new URLSearchParams({
         page: currentPage,
         limit: 12
       });
       
-      if (searchTerm) params.append('search', searchTerm);
-      if (selectedCategory) params.append('category', selectedCategory);
+      if (appliedSearchTerm) params.append('search', appliedSearchTerm);
+      if (appliedSelectedCategory) params.append('category', appliedSelectedCategory);
 
       const response = await fetch(`${API_BASE}/communities?${params}`);
       const data = await response.json();
@@ -46,7 +52,9 @@ function Community({ user }) {
     } catch (error) {
       console.error('Failed to fetch communities:', error);
     } finally {
+      setIsFetching(false);
       setLoading(false);
+      setInitialLoad(false);
     }
   };
 
@@ -74,15 +82,15 @@ function Community({ user }) {
       });
 
       if (response.ok) {
-        alert('Successfully joined the community!');
+        toast.success('Successfully joined the community!');
         fetchCommunities();
         fetchMyCommunities();
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to join community');
+        toast.error(errorData.message || 'Failed to join community');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setJoining(prev => ({ ...prev, [communityId]: false }));
     }
@@ -104,7 +112,7 @@ function Community({ user }) {
       });
 
       if (response.ok) {
-        alert('Community created successfully!');
+        toast.success('Community created successfully!');
         setShowCreateForm(false);
         setNewCommunity({
           name: '',
@@ -117,10 +125,10 @@ function Community({ user }) {
         fetchMyCommunities();
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to create community');
+        toast.error(errorData.message || 'Failed to create community');
       }
     } catch (error) {
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setCreating(false);
     }
@@ -129,12 +137,15 @@ function Community({ user }) {
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchCommunities();
+    setAppliedSearchTerm(searchTerm);
+    setAppliedSelectedCategory(selectedCategory);
   };
 
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedCategory('');
+    setAppliedSearchTerm('');
+    setAppliedSelectedCategory('');
     setCurrentPage(1);
   };
 
@@ -144,13 +155,7 @@ function Community({ user }) {
     'Philosophy', 'Art', 'Music', 'Travel', 'Cooking', 'Health', 'Other'
   ];
 
-  if (loading && activeTab === 'all') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // Removed full-page spinner to avoid reloading the whole filters area
 
   return (
     <div className="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6 lg:px-8">
@@ -253,7 +258,15 @@ function Community({ user }) {
 
         {/* Communities Grid */}
         {activeTab === 'all' ? (
-          communities.length === 0 ? (
+          initialLoad ? (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+              <h3 className="text-xl font-bold text-black mb-2">Loading communities</h3>
+              <p className="text-sm text-gray-600">Please wait a moment...</p>
+            </div>
+          ) : communities.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="bx bx-group text-4xl text-gray-400"></i>
@@ -262,7 +275,13 @@ function Community({ user }) {
               <p className="text-sm text-gray-600">Try adjusting your search criteria</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="relative">
+              {isFetching && (
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-xl">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {communities.map((community) => (
                 <div key={community._id} className="modern-card p-4 sm:p-6 group hover:scale-105 transition-transform duration-200">
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
@@ -317,6 +336,7 @@ function Community({ user }) {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
           )
         ) : (

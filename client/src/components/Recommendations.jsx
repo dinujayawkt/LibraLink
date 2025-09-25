@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 
 const API_BASE = 'http://localhost:4000/api';
 
@@ -8,6 +9,7 @@ function Recommendations({ user }) {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const toast = useToast();
 
   const questions = [
     {
@@ -110,11 +112,11 @@ function Recommendations({ user }) {
         setRecommendations(data.recommendations || []);
         setShowResults(true);
       } else {
-        alert('Failed to generate recommendations. Please try again.');
+        toast.error('Failed to generate recommendations. Please try again.');
       }
     } catch (error) {
       console.error('Error generating recommendations:', error);
-      alert('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
