@@ -18,8 +18,13 @@ const app = express();
 
 // CORS with dev-friendly origin matching
 const defaultOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+// Support a comma-separated list via CORS_ORIGINS and a single CLIENT_ORIGIN for convenience
+const fromEnvList = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 const configuredOrigin = process.env.CLIENT_ORIGIN ? [process.env.CLIENT_ORIGIN] : [];
-const allowedOrigins = [...new Set([...configuredOrigin, ...defaultOrigins])];
+const allowedOrigins = [...new Set([...configuredOrigin, ...fromEnvList, ...defaultOrigins])];
 
 app.use(
   cors({
@@ -29,6 +34,10 @@ app.use(
       if (allowedOrigins.includes(origin)) return callback(null, true);
       // Also allow any localhost:* during development
       if (/^http:\/\/localhost:\d+$/i.test(origin) || /^http:\/\/127\.0\.0\.1:\d+$/i.test(origin)) {
+        return callback(null, true);
+      }
+      // In production, allow Vercel preview/prod frontend domains by default
+      if (process.env.NODE_ENV === 'production' && /^https:\/\/.*\.vercel\.app$/i.test(origin)) {
         return callback(null, true);
       }
       return callback(new Error('Not allowed by CORS'));
