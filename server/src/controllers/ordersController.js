@@ -16,6 +16,7 @@ export const listOrders = async (req, res) => {
     const items = await Order.find(filter).sort({ createdAt: -1 });
     res.json(items);
   } catch (err) {
+    console.error('listOrders error:', err?.message || err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -26,6 +27,7 @@ export const updateOrderStatus = async (req, res) => {
     const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
     res.json(order);
   } catch (err) {
+    console.error('updateOrderStatus error:', err?.message || err);
     res.status(400).json({ message: 'Invalid data' });
   }
 };

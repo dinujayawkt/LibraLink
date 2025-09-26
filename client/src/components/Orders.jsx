@@ -26,10 +26,19 @@ function Orders({ user }) {
       const response = await fetch(`${API_BASE}/orders`, {
         credentials: 'include'
       });
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        console.error('Failed to fetch orders:', response.status, errText);
+        toast.error('Failed to load orders');
+        setOrders([]);
+        return;
+      }
       const data = await response.json();
-      setOrders(data || []);
+      setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
+      toast.error('Network error. Please try again.');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
