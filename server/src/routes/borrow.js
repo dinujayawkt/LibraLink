@@ -5,7 +5,11 @@ import { borrowBook, returnBook, extendBorrow, myBorrows } from '../controllers/
 
 const router = express.Router();
 
-const upload = multer({ dest: 'uploads/' });
+// On Vercel (serverless) the filesystem is read-only at runtime. Avoid disk writes there.
+// Fall back to disk storage in local/dev environments.
+const useMemoryStorage = !!process.env.VERCEL;
+const storage = useMemoryStorage ? multer.memoryStorage() : undefined;
+const upload = storage ? multer({ storage }) : multer({ dest: 'uploads/' });
 
 router.post('/borrow/:bookId', requireAuth, upload.single('photo'), borrowBook);
 

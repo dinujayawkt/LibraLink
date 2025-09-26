@@ -13,7 +13,8 @@ export const borrowBook = async (req, res) => {
       user: req.user.id,
       book: book._id,
       dueAt,
-      borrowPhotoUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
+      // Only set a URL when using disk storage (filename exists). In memory storage on Vercel, skip.
+      borrowPhotoUrl: req.file && req.file.filename ? `/uploads/${req.file.filename}` : undefined,
     });
     book.borrowedCount += 1;
     await book.save();
@@ -33,7 +34,8 @@ export const returnBook = async (req, res) => {
     tx.status = 'returned';
     tx.returnedAt = new Date();
     if (tx.dueAt && tx.returnedAt > tx.dueAt) tx.status = 'overdue';
-    if (req.file) tx.returnPhotoUrl = `/uploads/${req.file.filename}`;
+    // Only set a URL when using disk storage (filename exists). In memory storage on Vercel, skip.
+    if (req.file && req.file.filename) tx.returnPhotoUrl = `/uploads/${req.file.filename}`;
     await tx.save();
 
     const book = tx.book;
@@ -72,3 +74,4 @@ export const myBorrows = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
