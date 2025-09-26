@@ -16,6 +16,11 @@ import recommendationRoutes from './routes/recommendations.js';
 
 const app = express();
 
+// When running behind Vercel/Proxies, trust the first proxy hop so req.secure and protocol are correct
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // CORS with dev-friendly origin matching
 const defaultOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
 // Support a comma-separated list via CORS_ORIGINS and a single CLIENT_ORIGIN for convenience
