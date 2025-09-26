@@ -11,7 +11,9 @@ export const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, passwordHash });
     const token = jwt.sign({ id: user._id, role: user.role, name: user.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOpts = { httpOnly: true, sameSite: isProd ? 'none' : 'lax', secure: isProd };
+    res.cookie('token', token, cookieOpts);
     return res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role });
   } catch (err) {
     return res.status(500).json({ message: 'Server error' });
@@ -27,7 +29,9 @@ export const login = async (req, res) => {
     if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
     if (user.blocked) return res.status(403).json({ message: 'Account blocked' });
     const token = jwt.sign({ id: user._id, role: user.role, name: user.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOpts = { httpOnly: true, sameSite: isProd ? 'none' : 'lax', secure: isProd };
+    res.cookie('token', token, cookieOpts);
     return res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
   } catch (err) {
     return res.status(500).json({ message: 'Server error' });
@@ -35,7 +39,9 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie('token');
+  const isProd = process.env.NODE_ENV === 'production';
+  const cookieOpts = { httpOnly: true, sameSite: isProd ? 'none' : 'lax', secure: isProd };
+  res.clearCookie('token', cookieOpts);
   return res.json({ ok: true });
 };
 
@@ -49,3 +55,4 @@ export const me = (req, res) => {
     return res.json(null);
   }
 };
+
