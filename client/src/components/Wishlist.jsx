@@ -7,13 +7,13 @@ function Wishlist({ user }) {
 
   useEffect(() => {
     fetchWishlist();
-  }, [user?._id]);
+  }, [user?.id]);
 
   const fetchWishlist = async () => {
     try {
       setLoading(true);
       // For now, we'll use localStorage to simulate wishlist per user
-      const userKey = user?._id || user?.email || 'guest';
+      const userKey = user?.id || user?.email || 'guest';
       const key = `wishlist:${userKey}`;
 
       // Clear legacy global wishlist if present

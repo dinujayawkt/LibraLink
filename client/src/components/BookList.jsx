@@ -33,12 +33,12 @@ function BookList({ user }) {
   // Reload wishlist when the logged-in user changes
   useEffect(() => {
     loadWishlist();
-  }, [user?._id]);
+  }, [user?.id]);
 
   const loadWishlist = () => {
     try {
       // Use per-user wishlist key. Fall back to clearing legacy key if present.
-      const userKey = user?._id || user?.email || 'guest';
+      const userKey = user?.id || user?.email || 'guest';
       const key = `wishlist:${userKey}`;
 
       // Migrate/clear legacy global wishlist to avoid leakage across accounts
@@ -57,14 +57,14 @@ function BookList({ user }) {
   const addToWishlist = (book) => {
     const updatedWishlist = [...wishlist, book];
     setWishlist(updatedWishlist);
-    const userKey = user?._id || user?.email || 'guest';
+    const userKey = user?.id || user?.email || 'guest';
     localStorage.setItem(`wishlist:${userKey}`, JSON.stringify(updatedWishlist));
   };
 
   const removeFromWishlist = (bookId) => {
     const updatedWishlist = wishlist.filter(book => book._id !== bookId);
     setWishlist(updatedWishlist);
-    const userKey = user?._id || user?.email || 'guest';
+    const userKey = user?.id || user?.email || 'guest';
     localStorage.setItem(`wishlist:${userKey}`, JSON.stringify(updatedWishlist));
   };
 

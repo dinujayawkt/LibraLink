@@ -56,7 +56,7 @@ function App() {
     }
     // Clear wishlist for current user from localStorage to prevent cross-account leakage
     try {
-      const userKey = (user?._id || user?.email || 'guest');
+      const userKey = (user?.id || user?.email || 'guest');
       const key = `wishlist:${userKey}`;
       if (localStorage.getItem(key)) {
         localStorage.removeItem(key);
@@ -64,6 +64,10 @@ function App() {
       // Remove legacy global wishlist key if it exists
       if (localStorage.getItem('wishlist')) {
         localStorage.removeItem('wishlist');
+      }
+      // Optionally clear guest wishlist when logging out
+      if (localStorage.getItem('wishlist:guest')) {
+        localStorage.removeItem('wishlist:guest');
       }
     } catch (e) {
       console.error('Failed to clear wishlist on logout', e);
