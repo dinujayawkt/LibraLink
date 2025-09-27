@@ -54,6 +54,20 @@ function App() {
     } catch (error) {
       console.error('Logout failed:', error);
     }
+    // Clear wishlist for current user from localStorage to prevent cross-account leakage
+    try {
+      const userKey = (user?._id || user?.email || 'guest');
+      const key = `wishlist:${userKey}`;
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key);
+      }
+      // Remove legacy global wishlist key if it exists
+      if (localStorage.getItem('wishlist')) {
+        localStorage.removeItem('wishlist');
+      }
+    } catch (e) {
+      console.error('Failed to clear wishlist on logout', e);
+    }
     setUser(null);
   };
 

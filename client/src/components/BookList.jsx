@@ -30,23 +30,42 @@ function BookList({ user }) {
     loadWishlist();
   }, [appliedSearchTerm, appliedCategory, appliedAuthor, sortBy, sortOrder, currentPage]);
 
+  // Reload wishlist when the logged-in user changes
+  useEffect(() => {
+    loadWishlist();
+  }, [user?._id]);
+
   const loadWishlist = () => {
-    const savedWishlist = localStorage.getItem('wishlist');
-    if (savedWishlist) {
-      setWishlist(JSON.parse(savedWishlist));
+    try {
+      // Use per-user wishlist key. Fall back to clearing legacy key if present.
+      const userKey = user?._id || user?.email || 'guest';
+      const key = `wishlist:${userKey}`;
+
+      // Migrate/clear legacy global wishlist to avoid leakage across accounts
+      if (localStorage.getItem('wishlist')) {
+        localStorage.removeItem('wishlist');
+      }
+
+      const savedWishlist = localStorage.getItem(key);
+      setWishlist(savedWishlist ? JSON.parse(savedWishlist) : []);
+    } catch (e) {
+      console.error('Failed to load wishlist from storage', e);
+      setWishlist([]);
     }
   };
 
   const addToWishlist = (book) => {
     const updatedWishlist = [...wishlist, book];
     setWishlist(updatedWishlist);
-    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    const userKey = user?._id || user?.email || 'guest';
+    localStorage.setItem(`wishlist:${userKey}`, JSON.stringify(updatedWishlist));
   };
 
   const removeFromWishlist = (bookId) => {
     const updatedWishlist = wishlist.filter(book => book._id !== bookId);
     setWishlist(updatedWishlist);
-    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    const userKey = user?._id || user?.email || 'guest';
+    localStorage.setItem(`wishlist:${userKey}`, JSON.stringify(updatedWishlist));
   };
 
   const isInWishlist = (bookId) => {

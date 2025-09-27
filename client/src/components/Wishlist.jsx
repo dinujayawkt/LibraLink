@@ -7,16 +7,22 @@ function Wishlist({ user }) {
 
   useEffect(() => {
     fetchWishlist();
-  }, []);
+  }, [user?._id]);
 
   const fetchWishlist = async () => {
     try {
       setLoading(true);
-      // For now, we'll use localStorage to simulate wishlist
-      const savedWishlist = localStorage.getItem('wishlist');
-      if (savedWishlist) {
-        setWishlist(JSON.parse(savedWishlist));
+      // For now, we'll use localStorage to simulate wishlist per user
+      const userKey = user?._id || user?.email || 'guest';
+      const key = `wishlist:${userKey}`;
+
+      // Clear legacy global wishlist if present
+      if (localStorage.getItem('wishlist')) {
+        localStorage.removeItem('wishlist');
       }
+
+      const savedWishlist = localStorage.getItem(key);
+      setWishlist(savedWishlist ? JSON.parse(savedWishlist) : []);
     } catch (error) {
       console.error('Failed to fetch wishlist:', error);
     } finally {
@@ -27,7 +33,8 @@ function Wishlist({ user }) {
   const removeFromWishlist = (bookId) => {
     const updatedWishlist = wishlist.filter(book => book._id !== bookId);
     setWishlist(updatedWishlist);
-    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    const userKey = user?._id || user?.email || 'guest';
+    localStorage.setItem(`wishlist:${userKey}`, JSON.stringify(updatedWishlist));
   };
 
   if (loading) {
