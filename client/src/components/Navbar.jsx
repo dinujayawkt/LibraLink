@@ -48,7 +48,7 @@ function Navbar({ user, onLogout }) {
         <div className="flex justify-between items-center h-18">
           {/* Logo */}
           <div className="flex items-center group flex-shrink-0 ml-[-150px] mr-[50px]">
-            <Link to="/" className="flex items-center space-x-3 group-hover:scale-105 transition-transform duration-300">
+            <Link to={(user?.role === 'admin' || user?.role === 'assistant') ? '/admin' : '/'} className="flex items-center space-x-3 group-hover:scale-105 transition-transform duration-300">
               <div className="relative">
                 <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <i className="bx bx-library text-lg text-white"></i>
@@ -179,21 +179,25 @@ function Navbar({ user, onLogout }) {
       {isMenuOpen && (
         <div className="lg:hidden bg-gray-900 border-t border-gray-800">
           <div className="px-4 pt-3 pb-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold ${
-                  isActive(item.path)
-                    ? 'bg-white text-black shadow'
-                    : 'text-white/90 hover:text-white hover:bg-gray-800'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <i className={`bx ${item.icon} text-sm`}></i>
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {user?.role === 'member' && (
+              <>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold ${
+                      isActive(item.path)
+                        ? 'bg-white text-black shadow'
+                        : 'text-white/90 hover:text-white hover:bg-gray-800'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <i className={`bx ${item.icon} text-sm`}></i>
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </>
+            )}
             
             {/* Admin items for mobile */}
             {(user?.role === 'admin' || user?.role === 'assistant') && (
