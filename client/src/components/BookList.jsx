@@ -3,6 +3,7 @@ import { useToast } from './ToastProvider';
 import BookDetailsPopup from './BookDetailsPopup';
 import BookReviewsPopup from './BookReviewsPopup';
 import { API_BASE } from '../config';
+import { authHeaders } from '../utils/auth';
 
 function BookList({ user }) {
   const [books, setBooks] = useState([]);
@@ -130,6 +131,7 @@ function BookList({ user }) {
       const response = await fetch(`${API_BASE}/borrow/borrow/${bookId}`, {
         method: 'POST',
         credentials: 'include',
+        headers: authHeaders(),
         body: formData
       });
 

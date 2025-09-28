@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from './ToastProvider';
 import BookReviewsPopup from './BookReviewsPopup';
 import { API_BASE } from '../config';
+import { authHeaders } from '../utils/auth';
 
 function MyBooks({ user }) {
   const [transactions, setTransactions] = useState([]);
@@ -20,7 +21,8 @@ function MyBooks({ user }) {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/borrow/my`, {
-        credentials: 'include'
+        credentials: 'include',
+        headers: authHeaders(),
       });
       const data = await response.json();
       setTransactions(data || []);
@@ -39,9 +41,7 @@ function MyBooks({ user }) {
     try {
       const response = await fetch(`${API_BASE}/borrow/extend/${transactionId}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify({ days, reason: 'User requested extension' })
       });
@@ -90,6 +90,7 @@ function MyBooks({ user }) {
       const response = await fetch(`${API_BASE}/borrow/return/${transactionId}`, {
         method: 'POST',
         credentials: 'include',
+        headers: authHeaders(),
         body: formData
       });
 

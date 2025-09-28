@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiUrl } from '../config';
+import { authHeaders } from '../utils/auth';
 
 function Dashboard({ user }) {
   const [stats, setStats] = useState({
@@ -20,9 +21,9 @@ function Dashboard({ user }) {
     try {
       setError(null);
       const [statsResponse, popularResponse, myBooksResponse] = await Promise.all([
-        fetch(apiUrl('/books/stats'), { credentials: 'include' }),
-        fetch(apiUrl('/books/popular'), { credentials: 'include' }),
-        fetch(apiUrl('/borrow/my'), { credentials: 'include' })
+        fetch(apiUrl('/books/stats'), { credentials: 'include', headers: authHeaders() }),
+        fetch(apiUrl('/books/popular'), { credentials: 'include', headers: authHeaders() }),
+        fetch(apiUrl('/borrow/my'), { credentials: 'include', headers: authHeaders() })
       ]);
 
       if (!statsResponse.ok) throw new Error(`Books stats failed (${statsResponse.status})`);
@@ -45,7 +46,7 @@ function Dashboard({ user }) {
       } else {
         // Fallback: compute from full books list
         try {
-          const fallbackResp = await fetch(apiUrl('/books?limit=0'), { credentials: 'include' });
+          const fallbackResp = await fetch(apiUrl('/books?limit=0'), { credentials: 'include', headers: authHeaders() });
           if (!fallbackResp.ok) throw new Error(`Books fallback failed (${fallbackResp.status})`);
           const fallbackData = await fallbackResp.json();
           const items = Array.isArray(fallbackData.items) ? fallbackData.items : [];

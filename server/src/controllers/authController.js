@@ -14,7 +14,8 @@ export const register = async (req, res) => {
     const isProd = process.env.NODE_ENV === 'production';
     const cookieOpts = { httpOnly: true, sameSite: isProd ? 'none' : 'lax', secure: isProd };
     res.cookie('token', token, cookieOpts);
-    return res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role });
+    // Also return the token so mobile or environments with cookie issues can use Authorization header
+    return res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, token });
   } catch (err) {
     return res.status(500).json({ message: 'Server error' });
   }
@@ -32,7 +33,8 @@ export const login = async (req, res) => {
     const isProd = process.env.NODE_ENV === 'production';
     const cookieOpts = { httpOnly: true, sameSite: isProd ? 'none' : 'lax', secure: isProd };
     res.cookie('token', token, cookieOpts);
-    return res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
+    // Also return the token so mobile or environments with cookie issues can use Authorization header
+    return res.json({ id: user._id, name: user.name, email: user.email, role: user.role, token });
   } catch (err) {
     return res.status(500).json({ message: 'Server error' });
   }

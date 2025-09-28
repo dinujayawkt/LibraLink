@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE, apiUrl } from '../config';
+import { authHeaders } from '../utils/auth';
 
 function AdminDashboard({ user }) {
   const [stats, setStats] = useState({
@@ -21,10 +22,10 @@ function AdminDashboard({ user }) {
       setError(null);
       setLoading(true);
       const [booksResponse, usersResponse, ordersResponse, borrowsResponse] = await Promise.all([
-        fetch(apiUrl('/books?limit=1'), { credentials: 'include' }),
-        fetch(apiUrl('/admin/users'), { credentials: 'include' }),
-        fetch(apiUrl('/orders'), { credentials: 'include' }),
-        fetch(apiUrl('/admin/borrows'), { credentials: 'include' })
+        fetch(apiUrl('/books?limit=1'), { credentials: 'include', headers: authHeaders() }),
+        fetch(apiUrl('/admin/users'), { credentials: 'include', headers: authHeaders() }),
+        fetch(apiUrl('/orders'), { credentials: 'include', headers: authHeaders() }),
+        fetch(apiUrl('/admin/borrows'), { credentials: 'include', headers: authHeaders() })
       ]);
 
       if (!booksResponse.ok) throw new Error(`Books request failed (${booksResponse.status})`);

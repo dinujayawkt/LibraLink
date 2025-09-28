@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE } from '../config';
+import { setToken } from '../utils/auth';
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ function Login({ onLogin }) {
 
       if (response.ok) {
         const userData = await response.json();
+        if (userData?.token) {
+          setToken(userData.token);
+        }
         onLogin(userData);
         
         // Redirect based on user role

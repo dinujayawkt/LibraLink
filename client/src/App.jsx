@@ -16,6 +16,7 @@ import Community from './components/Community';
 import CommunityChat from './components/CommunityChat';
 import Recommendations from './components/Recommendations';
 import Navbar from './components/Navbar';
+import { authHeaders, clearToken } from './utils/auth';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -28,7 +29,8 @@ function App() {
   const checkAuth = async () => {
     try {
       const response = await fetch(`${API_BASE}/auth/me`, {
-        credentials: 'include'
+        credentials: 'include',
+        headers: authHeaders(),
       });
       if (response.ok) {
         const userData = await response.json();
@@ -49,7 +51,8 @@ function App() {
     try {
       await fetch(`${API_BASE}/auth/logout`, {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
+        headers: authHeaders(),
       });
     } catch (error) {
       console.error('Logout failed:', error);
@@ -72,6 +75,8 @@ function App() {
     } catch (e) {
       console.error('Failed to clear wishlist on logout', e);
     }
+    // Clear auth token used for Authorization header
+    clearToken();
     setUser(null);
   };
 

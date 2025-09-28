@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { API_BASE } from '../config';
+import { setToken } from '../utils/auth';
 
 function Register({ onLogin }) {
   const [formData, setFormData] = useState({
@@ -46,6 +47,9 @@ function Register({ onLogin }) {
 
       if (response.ok) {
         const userData = await response.json();
+        if (userData?.token) {
+          setToken(userData.token);
+        }
         onLogin(userData);
       } else {
         const errorData = await response.json();
