@@ -17,10 +17,9 @@ function Dashboard({ user }) {
 
   const fetchDashboardData = async () => {
     try {
-      const ts = Date.now(); // cache buster to avoid CDN/stale caching in prod
       const [statsResponse, popularResponse, myBooksResponse] = await Promise.all([
-        fetch(`${API_BASE}/books/stats?nc=${ts}`),
-        fetch(`${API_BASE}/books/popular?nc=${ts}`),
+        fetch(`${API_BASE}/books/stats`),
+        fetch(`${API_BASE}/books/popular`),
         fetch(`${API_BASE}/borrow/my`, { credentials: 'include' })
       ]);
 
@@ -29,20 +28,9 @@ function Dashboard({ user }) {
         statsData = await statsResponse.json();
       } catch (_e) {
         // ignore JSON parse issues and fallback
-        console.warn('Dashboard: failed to parse stats JSON', _e);
       }
-      let popularData = [];
-      try {
-        popularData = await popularResponse.json();
-      } catch (e) {
-        console.warn('Dashboard: failed to parse popular JSON', e);
-      }
-      let myBooksData = [];
-      try {
-        myBooksData = await myBooksResponse.json();
-      } catch (e) {
-        console.warn('Dashboard: failed to parse my books JSON', e);
-      }
+      const popularData = await popularResponse.json();
+      const myBooksData = await myBooksResponse.json();
 
       const activeBorrows = myBooksData.filter(book => book.status === 'borrowed');
 
@@ -56,7 +44,7 @@ function Dashboard({ user }) {
       } else {
         // Fallback: compute from full books list
         try {
-          const fallbackResp = await fetch(`${API_BASE}/books?limit=0&nc=${ts}`);
+          const fallbackResp = await fetch(`${API_BASE}/books?limit=0`);
           const fallbackData = await fallbackResp.json();
           const items = Array.isArray(fallbackData.items) ? fallbackData.items : [];
           const totalTitles = typeof fallbackData.total === 'number' ? fallbackData.total : items.length;
@@ -73,21 +61,12 @@ function Dashboard({ user }) {
             popularBooks: popularData.slice(0, 5)
           });
         } catch (err) {
-          console.error('Dashboard: failed to compute fallback stats', err);
-          console.log('Dashboard: raw responses', {
-            statsOk: statsResponse.ok,
-            statsStatus: statsResponse.status,
-            statsData,
-            popularOk: popularResponse.ok,
-            popularStatus: popularResponse.status,
-            myBooksOk: myBooksResponse.ok,
-            myBooksStatus: myBooksResponse.status,
-          });
+          console.error('Failed to compute fallback stats:', err);
           setStats(prev => ({ ...prev, myBorrowedBooks: activeBorrows.length, popularBooks: popularData.slice(0, 5) }));
         }
       }
     } catch (error) {
-      console.error('Dashboard: failed to fetch dashboard data', error);
+      console.error('Failed to fetch dashboard data:', error);
     } finally {
       setLoading(false);
     }

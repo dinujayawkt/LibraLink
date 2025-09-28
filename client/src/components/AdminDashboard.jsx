@@ -18,22 +18,17 @@ function AdminDashboard({ user }) {
   const fetchAdminStats = async () => {
     try {
       setLoading(true);
-      const ts = Date.now();
       const [booksResponse, usersResponse, ordersResponse, borrowsResponse] = await Promise.all([
-        fetch(`${API_BASE}/books?limit=1&nc=${ts}`),
-        fetch(`${API_BASE}/admin/users?nc=${ts}`, { credentials: 'include' }),
-        fetch(`${API_BASE}/orders?nc=${ts}`, { credentials: 'include' }),
-        fetch(`${API_BASE}/admin/borrows?nc=${ts}`, { credentials: 'include' })
+        fetch(`${API_BASE}/books?limit=1`),
+        fetch(`${API_BASE}/admin/users`, { credentials: 'include' }),
+        fetch(`${API_BASE}/orders`, { credentials: 'include' }),
+        fetch(`${API_BASE}/admin/borrows`, { credentials: 'include' })
       ]);
 
-      let booksData = { total: 0 };
-      let usersData = [];
-      let ordersData = [];
-      let borrowsData = [];
-      try { booksData = await booksResponse.json(); } catch (e) { console.warn('AdminDashboard: parse books JSON failed', e); }
-      try { usersData = await usersResponse.json(); } catch (e) { console.warn('AdminDashboard: parse users JSON failed', e); }
-      try { ordersData = await ordersResponse.json(); } catch (e) { console.warn('AdminDashboard: parse orders JSON failed', e); }
-      try { borrowsData = await borrowsResponse.json(); } catch (e) { console.warn('AdminDashboard: parse borrows JSON failed', e); }
+      const booksData = await booksResponse.json();
+      const usersData = await usersResponse.json();
+      const ordersData = await ordersResponse.json();
+      const borrowsData = await borrowsResponse.json();
 
       setStats({
         totalBooks: booksData.total || 0,
@@ -43,7 +38,7 @@ function AdminDashboard({ user }) {
       });
       setBorrows(borrowsData || []);
     } catch (error) {
-      console.error('AdminDashboard: failed to fetch admin stats', error);
+      console.error('Failed to fetch admin stats:', error);
     } finally {
       setLoading(false);
     }

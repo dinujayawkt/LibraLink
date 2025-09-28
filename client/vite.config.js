@@ -4,16 +4,4 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
-    host: true, // listen on all addresses so mobile devices on LAN can access
-    port: 5173,
-    proxy: {
-      // Proxy API requests to backend (adjust target if your server runs elsewhere)
-      '/api': {
-        target: 'http://localhost:4000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
 })
