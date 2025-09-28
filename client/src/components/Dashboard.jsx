@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { API_BASE } from '../config';
+import { apiUrl } from '../config';
 
 function Dashboard({ user }) {
   const [stats, setStats] = useState({
@@ -10,6 +10,7 @@ function Dashboard({ user }) {
     popularBooks: []
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -17,34 +18,35 @@ function Dashboard({ user }) {
 
   const fetchDashboardData = async () => {
     try {
+      setError(null);
       const [statsResponse, popularResponse, myBooksResponse] = await Promise.all([
-        fetch(`${API_BASE}/books/stats`),
-        fetch(`${API_BASE}/books/popular`),
-        fetch(`${API_BASE}/borrow/my`, { credentials: 'include' })
+        fetch(apiUrl('/books/stats'), { credentials: 'include' }),
+        fetch(apiUrl('/books/popular'), { credentials: 'include' }),
+        fetch(apiUrl('/borrow/my'), { credentials: 'include' })
       ]);
 
-      let statsData = null;
-      try {
-        statsData = await statsResponse.json();
-      } catch (_e) {
-        // ignore JSON parse issues and fallback
-      }
+      if (!statsResponse.ok) throw new Error(`Books stats failed (${statsResponse.status})`);
+      if (!popularResponse.ok) throw new Error(`Popular books failed (${popularResponse.status})`);
+      if (!myBooksResponse.ok) throw new Error(`My borrows failed (${myBooksResponse.status})`);
+
+      const statsData = await statsResponse.json();
       const popularData = await popularResponse.json();
       const myBooksData = await myBooksResponse.json();
 
-      const activeBorrows = myBooksData.filter(book => book.status === 'borrowed');
+      const activeBorrows = Array.isArray(myBooksData) ? myBooksData.filter(book => book.status === 'borrowed') : [];
 
-      if (statsResponse.ok && statsData && typeof statsData.availableBooks === 'number' && typeof statsData.totalBooks === 'number') {
+      if (statsData && typeof statsData.availableBooks === 'number' && typeof statsData.totalBooks === 'number') {
         setStats({
           totalBooks: statsData.totalBooks || 0,
           availableBooks: statsData.availableBooks || 0,
           myBorrowedBooks: activeBorrows.length,
-          popularBooks: popularData.slice(0, 5)
+          popularBooks: Array.isArray(popularData) ? popularData.slice(0, 5) : []
         });
       } else {
         // Fallback: compute from full books list
         try {
-          const fallbackResp = await fetch(`${API_BASE}/books?limit=0`);
+          const fallbackResp = await fetch(apiUrl('/books?limit=0'), { credentials: 'include' });
+          if (!fallbackResp.ok) throw new Error(`Books fallback failed (${fallbackResp.status})`);
           const fallbackData = await fallbackResp.json();
           const items = Array.isArray(fallbackData.items) ? fallbackData.items : [];
           const totalTitles = typeof fallbackData.total === 'number' ? fallbackData.total : items.length;
@@ -58,15 +60,16 @@ function Dashboard({ user }) {
             totalBooks: totalTitles,
             availableBooks: availableCopies,
             myBorrowedBooks: activeBorrows.length,
-            popularBooks: popularData.slice(0, 5)
+            popularBooks: Array.isArray(popularData) ? popularData.slice(0, 5) : []
           });
         } catch (err) {
           console.error('Failed to compute fallback stats:', err);
-          setStats(prev => ({ ...prev, myBorrowedBooks: activeBorrows.length, popularBooks: popularData.slice(0, 5) }));
+          setStats(prev => ({ ...prev, myBorrowedBooks: activeBorrows.length, popularBooks: Array.isArray(popularData) ? popularData.slice(0, 5) : [] }));
         }
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
+      setError(error?.message || 'Failed to load dashboard data. Check API connection.');
     } finally {
       setLoading(false);
     }
@@ -95,6 +98,12 @@ function Dashboard({ user }) {
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mx-auto mt-6 slide-in-up" style={{animationDelay: '0.4s'}}></div>
         </div>
+
+        {error && (
+          <div className="mb-6 p-3 rounded border border-red-200 bg-red-50 text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Stats Tiles (flat colored like screenshot) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">

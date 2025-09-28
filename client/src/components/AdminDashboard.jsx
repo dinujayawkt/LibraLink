@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { API_BASE } from '../config';
+import { API_BASE, apiUrl } from '../config';
 
 function AdminDashboard({ user }) {
   const [stats, setStats] = useState({
@@ -10,6 +10,7 @@ function AdminDashboard({ user }) {
   });
   const [loading, setLoading] = useState(true);
   const [borrows, setBorrows] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchAdminStats();
@@ -17,28 +18,39 @@ function AdminDashboard({ user }) {
 
   const fetchAdminStats = async () => {
     try {
+      setError(null);
       setLoading(true);
       const [booksResponse, usersResponse, ordersResponse, borrowsResponse] = await Promise.all([
-        fetch(`${API_BASE}/books?limit=1`),
-        fetch(`${API_BASE}/admin/users`, { credentials: 'include' }),
-        fetch(`${API_BASE}/orders`, { credentials: 'include' }),
-        fetch(`${API_BASE}/admin/borrows`, { credentials: 'include' })
+        fetch(apiUrl('/books?limit=1'), { credentials: 'include' }),
+        fetch(apiUrl('/admin/users'), { credentials: 'include' }),
+        fetch(apiUrl('/orders'), { credentials: 'include' }),
+        fetch(apiUrl('/admin/borrows'), { credentials: 'include' })
       ]);
+
+      if (!booksResponse.ok) throw new Error(`Books request failed (${booksResponse.status})`);
+      if (!usersResponse.ok) throw new Error(`Users request failed (${usersResponse.status})`);
+      if (!ordersResponse.ok) throw new Error(`Orders request failed (${ordersResponse.status})`);
+      if (!borrowsResponse.ok) throw new Error(`Borrows request failed (${borrowsResponse.status})`);
 
       const booksData = await booksResponse.json();
       const usersData = await usersResponse.json();
       const ordersData = await ordersResponse.json();
       const borrowsData = await borrowsResponse.json();
 
+      const usersCount = Array.isArray(usersData) ? usersData.length : (usersData?.total || 0);
+      const ordersCount = Array.isArray(ordersData) ? ordersData.length : (ordersData?.total || 0);
+      const borrowsArr = Array.isArray(borrowsData) ? borrowsData : (borrowsData?.items || []);
+
       setStats({
-        totalBooks: booksData.total || 0,
-        totalUsers: usersData.length || 0,
-        totalOrders: ordersData.length || 0,
-        activeBorrows: borrowsData.filter(b => b.status === 'borrowed').length || 0
+        totalBooks: Number(booksData?.total) || 0,
+        totalUsers: usersCount,
+        totalOrders: ordersCount,
+        activeBorrows: borrowsArr.filter(b => b.status === 'borrowed').length || 0
       });
-      setBorrows(borrowsData || []);
-    } catch (error) {
-      console.error('Failed to fetch admin stats:', error);
+      setBorrows(borrowsArr);
+    } catch (err) {
+      console.error('Failed to fetch admin stats:', err);
+      setError(err?.message || 'Failed to load dashboard data. Check API connection.');
     } finally {
       setLoading(false);
     }
@@ -137,6 +149,12 @@ function AdminDashboard({ user }) {
           <p className="text-lg text-gray-600">Manage your LibraLink system</p>
           <div className="w-24 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mx-auto mt-4"></div>
         </div>
+
+        {error && (
+          <div className="mb-6 p-3 rounded border border-red-200 bg-red-50 text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Borrowing Statistics (top, expanded) */}
         <div className="mt-4 mb-12">
