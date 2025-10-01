@@ -1,74 +1,82 @@
-📚 LibraLink – eLibrary Management System
+<h1>📚 LibraLink – eLibrary Management System</h1>
 
-LibraLink is a full-stack library management system built with the MERN stack (MongoDB, Express.js, React.js, Node.js).
-It modernizes the traditional library assistant workflow by digitizing borrowing, returning, and managing books through an online platform.
+<p>
+LibraLink is a full-stack library management system built with the 
+<strong>MERN stack (MongoDB, Express.js, React.js, Node.js)</strong>. <br>
+It modernizes the traditional library assistant workflow by digitizing borrowing, returning, 
+and managing books through an online platform.
+</p>
 
---🚀 Features--
+<hr>
 
-👤 User Side
+<h2>🚀 Features</h2>
 
-🔍 Search and browse books with category filters.
+<h3>👤 User Side</h3>
+<ul>
+  <li>🔍 Search and browse books with category filters.</li>
+  <li>📖 View summarized book details.</li>
+  <li>❤️ Add books to wishlist.</li>
+  <li>📚 Borrow, request, and extend due dates for borrowed books.</li>
+  <li>🤝 Join book communities and discussions.</li>
+  <li>🧩 Take a recommendation quiz to discover books that match your interests.</li>
+</ul>
 
-📖 View summarized book details.
+<h3>🛠️ Admin Side</h3>
+<ul>
+  <li>➕ Add, edit, and delete books.</li>
+  <li>📋 Accept or reject borrow requests.</li>
+  <li>👥 Manage users (delete/block).</li>
+  <li>📊 View library usage reports and statistics.</li>
+</ul>
 
-❤️ Add books to wishlist.
+<hr>
 
-📚 Borrow, request, and extend due dates for borrowed books.
+<h2>🎯 Why LibraLink?</h2>
+<p>
+Traditional libraries rely on manual assistants to manage borrowing and returning. 
+LibraLink streamlines this into a digital platform with features like:
+</p>
+<ul>
+  <li>A QR code-based borrowing and returning workflow (conceptual in this version).</li>
+  <li>Fully responsive design for both desktop and mobile.</li>
+  <li>User-friendly experience powered by <strong>Tailwind CSS</strong> and <strong>Boxicons</strong>.</li>
+</ul>
 
-🤝 Join book communities and discussions.
+<p>
+⚠️ <strong>Important Note:</strong> The QR feature is not functional in this version. <br>
+LibraLink is currently just the software application. The QR workflow will only work when 
+integrated with the required hardware setup in a real-world environment.
+</p>
 
-🧩 Take a recommendation quiz to discover books that match your interests.
+<hr>
 
+<h2>🛠️ Tech Stack</h2>
+<ul>
+  <li><strong>Frontend:</strong> React.js, Tailwind CSS, Boxicons</li>
+  <li><strong>Backend:</strong> Node.js, Express.js</li>
+  <li><strong>Database:</strong> MongoDB</li>
+  <li><strong>Deployment:</strong> Vercel (both frontend & backend)</li>
+</ul>
 
+<hr>
 
---🛠️ Admin Side--
+<h2>📷 Demo</h2>
+<p>🎥 Demo video attached in LinkedIn post.</p>
 
+<hr>
 
-➕ Add, edit, and delete books.
+<h2>🔮 Future Improvements</h2>
+<ul>
+  <li>Hardware integration for QR code scanning.</li>
+  <li>Advanced analytics dashboard for admins.</li>
+  <li>Payment integration for overdue fines.</li>
+  <li>Multi-language support.</li>
+</ul>
 
-📋 Accept or reject borrow requests.
+<hr>
 
-👥 Manage users (delete/block).
-
-📊 View library usage reports and statistics.
-
-
-
-
-
---🎯 Why LibraLink? --
-
-Traditional libraries rely on manual assistants to manage borrowing and returning. LibraLink streamlines this into a digital platform with features like:
-A QR code-based borrowing and returning workflow (conceptual in this version).
-Fully responsive design for both desktop and mobile.
-Use-friendly experience powered by Tailwind CSS and Boxicons.
-
-⚠️ Important Note: The QR feature is not functional in this version.
-LibraLink is currently just the software application. The QR workflow will only work when integrated with the required hardware setup in a real-world environment.
-
-
---🛠️ Tech Stack --
-
-Frontend: React.js, Tailwind CSS, Boxicons
-Backend: Node.js, Express.js
-Database: MongoDB
-Deployment: Vercel (both frontend & backend)
-
-
-
--- 📷 Demo --
-
-🎥 Demo video attached in LinkedIn post.
-
-
--- 🔮 Future Improvements --
-
-Hardware integration for QR code scanning.
-Advanced analytics dashboard for admins.
-Payment integration for overdue fines.
-
-Multi-language support.
-
---👨‍💻 Author--
-
-Developed by Thamoj Dinujaya 🎓 | LinkedIn Profile - www.linkedin.com/in/thamoj-dinujaya-4b3094301
+<h2>👨‍💻 Author</h2>
+<p>
+Developed by <strong>Thamoj Dinujaya 🎓</strong><br>
+🔗 <a href="https://www.linkedin.com/in/thamoj-dinujaya-4b3094301" target="_blank">LinkedIn Profile</a>
+</p>
